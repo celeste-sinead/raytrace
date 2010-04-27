@@ -49,14 +49,17 @@ struct DisplayColour {
     double b;
 
     /** Convert to arbitrary integer color depth.  Depth is in bits */
-    unsigned long red(unsigned int depth);
-    unsigned long green(unsigned int depth);
-    unsigned long blue(unsigned int depth);
+    unsigned long red(unsigned int depth)
+        { return r*(1<<depth); }
+    unsigned long green(unsigned int depth)
+        { return g*(1<<depth); }
+    unsigned long blue(unsigned int depth)
+        { return b*(1<<depth); }
 
     /********* Various conversion functions **********/
 
     /** Convert using a linear scale.  Simple, easy, and not very pretty */
-    void fromRayLinear(const RayColour & colour);
+    void fromRayLinear(const RayColour & colour, double maximum);
 };
 
 #endif

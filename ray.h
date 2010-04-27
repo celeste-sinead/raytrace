@@ -67,7 +67,7 @@ protected:
      *  and needs to be freed by Ray */
     void       *m_originGoodies;
     
-public:
+public:  
     //! A unit vector with the direction of this Ray
     RayVector   m_dir; 
     //! The point where this ray is observed
@@ -75,6 +75,9 @@ public:
     //! The colour of this ray
     RayColour   m_colour;
     
+    Ray(int depthLimit) : m_depthLimit(depthLimit)
+        {}
+	
     /** Create a parent for this Ray, if possible.  
      *  @return The new parent.  0 if creation fails (ie. we've reached the
      *          limit of the Ray hierarchy) */

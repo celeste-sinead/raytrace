@@ -9,7 +9,9 @@ all: rayTest
 BINARIES= rayTest
 
 RAYTEST_OBJS= \
+    colour.o \
     geom.o \
+    ray.o \
     rayObject.o \
     sphere.o 
 

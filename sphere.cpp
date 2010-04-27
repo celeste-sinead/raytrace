@@ -20,6 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
+#include <cmath>
+
 #include "sphere.h"
 #include "ray.h"
 #include "colour.h"
@@ -36,9 +38,26 @@ void Sphere::colour(Ray& inbound)
 //! Determines if a ray intersects this sphere
 bool Sphere::intersectsFine(Ray& inbound)
 {
+    /* Idea is simple - we see if the ray passes within a the circular 
+     * intersection of the sphere and a plane normal to the vector from
+     * the endpoint of the ray and the center of the sphere.  ( also,
+     * the length of third line in a triangle formed by the vector from the
+     * endpoint to the centroid, and the direction of the ray, is less than
+     * radius of the sphere ) */
+  
     // Vector from centre of sphere to endpoint of ray
     RayVector fromCent = inbound.m_endpoint - m_origin;
     // Unit vector of fromCent
     RayVector uFromCent (fromCent);
     uFromCent.unitify();
+    // The magic of dot products:
+    double cosOmega = inbound.m_dir.dot(uFromCent);
+    /* Negative result means the vector is pointing *away* from the center
+     * of the sphere */
+    if(cosOmega <= 0.0) return false;
+    // cosOmega is also the adjacent of a triangle, we want the opposite -
+    double opposite = sqrt( 1 - (cosOmega*cosOmega) );
+    // Find the intersect radius of the ray
+    double intersectRad = opposite * (fromCent.length()/cosOmega);
+    return intersectRad <= m_radius;
 }
