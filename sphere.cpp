@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <iputil/unit.h>
 
 #include "sphere.h"
 #include "ray.h"
@@ -30,6 +31,7 @@
 //! Colours an intersecting ray
 void Sphere::colour(Ray& inbound)
 {
+    // Hey, it's all stubby!
     inbound.m_colour.r = 1.0;
     inbound.m_colour.g = 1.0;
     inbound.m_colour.b = 1.0;
@@ -38,26 +40,51 @@ void Sphere::colour(Ray& inbound)
 //! Determines if a ray intersects this sphere
 bool Sphere::intersectsFine(Ray& inbound)
 {
-    /* Idea is simple - we see if the ray passes within a the circular 
-     * intersection of the sphere and a plane normal to the vector from
-     * the endpoint of the ray and the center of the sphere.  ( also,
-     * the length of third line in a triangle formed by the vector from the
-     * endpoint to the centroid, and the direction of the ray, is less than
-     * radius of the sphere ) */
-  
-    // Vector from centre of sphere to endpoint of ray
-    RayVector fromCent = inbound.m_endpoint - m_origin;
-    // Unit vector of fromCent
-    RayVector uFromCent (fromCent);
-    uFromCent.unitify();
-    // The magic of dot products:
-    double cosOmega = inbound.m_dir.dot(uFromCent);
-    /* Negative result means the vector is pointing *away* from the center
-     * of the sphere */
-    if(cosOmega <= 0.0) return false;
-    // cosOmega is also the adjacent of a triangle, we want the opposite -
-    double opposite = sqrt( 1 - (cosOmega*cosOmega) );
-    // Find the intersect radius of the ray
-    double intersectRad = opposite * (fromCent.length()/cosOmega);
-    return intersectRad <= m_radius;
+    /* The coarse intersect check performed in RayObject::intersects()
+     * determins if the ray intersects a containing a sphere.  This IS
+     * a sphere, so if the coarse check succeeded, there is an intersect. */
+    return true;
 }
+
+//! Check intersect detection for sphere.
+START_TEST_FN(sphere_intersect,"Sphere Intersect Detection")
+    Sphere s ( Coord(0.0,0.0,0.0), 1.0);
+    Ray r (1 /* no reflection */);
+   
+    RayVector endpt (2.0, 0.0, 0.0);
+    
+    /* Test a ray directed at the centre of the sphere */
+    RayVector direct_dir (-1.0, 0.0, 0.0);
+    r.m_endpoint = endpt;
+    r.m_dir = direct_dir;
+    TEST_CONDITION( s.intersects(r), "Direct intersection check\n");
+    
+    /* Test a non-centred intersection */
+    RayVector indirect_dir (-2.0, 0.5, 0.0);
+    indirect_dir.unitify();
+    r.m_dir = indirect_dir;
+    TEST_CONDITION( s.intersects(r), "Indirect intersection check\n");
+    
+    /* Test an edge intersection */
+    RayVector edge_dir (-2.0, 1.0, 0.0);
+    edge_dir.unitify();
+    r.m_dir = edge_dir;
+    TEST_CONDITION( s.intersects(r), "Edge intersection check\n");
+    
+    /* Test the complete wrong direction */
+    RayVector opposite_dir (1.0, 0.0, 0.0);
+    r.m_dir = opposite_dir;
+    TEST_CONDITION( ! s.intersects(r), "Opposite direction miss check\n");
+    
+    /* Normal to direction of sphere */
+    RayVector normal_dir (0.0, 1.0, 0.0);
+    r.m_dir = normal_dir;
+    TEST_CONDITION( ! s.intersects(r), "Normal miss check\n");
+    
+    /* Near miss */
+    RayVector near_dir (-1.1, 2.0, 0.0);
+    near_dir.unitify();
+    r.m_dir = near_dir;
+    TEST_CONDITION( ! s.intersects(r), "Near miss check\n");
+    
+END_TEST_FN

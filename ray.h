@@ -75,7 +75,12 @@ public:
     //! The colour of this ray
     RayColour   m_colour;
     
-    Ray(int depthLimit) : m_depthLimit(depthLimit)
+    Ray(int depthLimit) : 
+        m_depth(0), 
+	m_depthLimit(depthLimit),
+	m_origin(0),
+	m_originDist(0),
+	m_originGoodies(0)
         {}
 	
     /** Create a parent for this Ray, if possible.  

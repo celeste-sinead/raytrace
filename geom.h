@@ -39,10 +39,10 @@ public:
     RayVector() : m_x(0.0), m_y(0.0), m_z(0.0) 
         {}
     RayVector(double cx, double cy, double cz) : m_x(cx), m_y(cy), m_z(cz) 
-        {}
+        { calcLength(); }
     RayVector(const RayVector &other) :
-        m_x(other.m_x), m_y(other.m_y), m_z(other.m_z) 
-        {}
+        m_x(other.m_x), m_y(other.m_y), m_z(other.m_z), m_length(other.m_length)
+        { }
 
     double x() const { return m_x; }
     void setX(double x);
