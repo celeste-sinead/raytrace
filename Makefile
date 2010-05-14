@@ -4,13 +4,14 @@ INCLUDES=
 LIBS= -lm
 .SECONDEXPANSION:
 
-all: rayTest
-
 BINARIES= rayTest
+
+all: $(BINARIES) 
 
 COMMON_OBJS = \
     colour.o \
     geom.o \
+    image.o \
     ray.o \
     rayObject.o \
     sphere.o 
@@ -18,15 +19,27 @@ COMMON_OBJS = \
 RAYTEST_OBJS= \
     $(COMMON_OBJS) \
     rayTest.o 
-    
+   
+# Rules for compiling .cpp files
 CXX_SRCS=$(wildcard *.cpp)
 CXX_OBJS=$(CXX_SRCS:.cpp=.o)
-$(CXX_OBJS): $$(patsubst %.o,%.cpp,$$(@))
+$(CXX_OBJS): $$(patsubst %.o,%.cpp,$$(@)) $$(patsubst %.o,%.d,$$(@))
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(@:.o=.cpp) -c -o $(@) 
 
+# Set up .cpp dependency generation
+CXX_DEPENDS=$(CXX_SRCS:.cpp=.d)
+$(CXX_DEPENDS): $$(patsubst %.d,%.cpp,$$@)
+	$(CXX) -MM $(@:.d=.cpp) -o $(@)
+-include $(CXX_DEPENDS)
+
+# Build test binary
 rayTest: $(RAYTEST_OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBS) $(RAYTEST_OBJS) -o rayTest
 
 .phony = clean
+clean: ; rm -f *.o *.d $(BINARIES)
 
-clean: ; rm $(CXX_OBJS) $(BINARIES)
+.phony = debug_vars
+debug_vars: 
+	@echo 'CXX_DEPENDS: $(CXX_DEPENDS)'
+	@echo 'CXX_SRCS: $(CXX_SRCS)'
