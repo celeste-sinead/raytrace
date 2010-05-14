@@ -1,7 +1,7 @@
 CXX= g++
 CXXFLAGS= -Wall -g3 -O0
 INCLUDES=
-LIBS= -lm
+LIBS= -lm -liputil
 .SECONDEXPANSION:
 
 BINARIES= rayTest
@@ -34,7 +34,7 @@ $(CXX_DEPENDS): $$(patsubst %.d,%.cpp,$$@)
 
 # Build test binary
 rayTest: $(RAYTEST_OBJS)
-	$(CXX) $(CXXFLAGS) $(LIBS) $(RAYTEST_OBJS) -o rayTest
+	$(CXX) $(CXXFLAGS) $(RAYTEST_OBJS) $(LIBS) -o rayTest
 
 .phony = clean
 clean: ; rm -f *.o *.d $(BINARIES)

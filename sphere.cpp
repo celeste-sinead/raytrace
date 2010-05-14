@@ -66,7 +66,7 @@ START_TEST_FN(sphere_intersect,"Sphere Intersect Detection")
     TEST_CONDITION( s.intersects(r), "Indirect intersection check\n");
     
     /* Test an edge intersection */
-    RayVector edge_dir (-2.0, 1.0, 0.0);
+    RayVector edge_dir (-1.5, sqrt(3)/2.0, 0.0);
     edge_dir.unitify();
     r.m_dir = edge_dir;
     TEST_CONDITION( s.intersects(r), "Edge intersection check\n");
