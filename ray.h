@@ -56,17 +56,6 @@ private:
     int         m_depth;
     int         m_depthLimit;
 
-protected:
-    friend class RayObject;
-
-    //! The current closest known intersecting RayObject
-    RayObject  *m_origin;
-    //! The distance from m_endpoint to m_origin
-    double     *m_originDist;
-    /** Anything m_origin wants to cache.  This is dynamically allocated,
-     *  and needs to be freed by Ray */
-    void       *m_originGoodies;
-    
 public:  
     //! A unit vector with the direction of this Ray
     RayVector   m_dir; 
@@ -75,12 +64,9 @@ public:
     //! The colour of this ray
     RayColour   m_colour;
     
-    Ray(int depthLimit) : 
+    Ray(int depthLimit=0) : 
         m_depth(0), 
-	m_depthLimit(depthLimit),
-	m_origin(0),
-	m_originDist(0),
-	m_originGoodies(0)
+	m_depthLimit(depthLimit)
         {}
 	
     /** Create a parent for this Ray, if possible.  

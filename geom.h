@@ -43,6 +43,7 @@ public:
     RayVector(const RayVector &other) :
         m_x(other.m_x), m_y(other.m_y), m_z(other.m_z), m_length(other.m_length)
         { }
+    RayVector & operator=(const RayVector &other);
 
     double x() const { return m_x; }
     void setX(double x);
@@ -50,12 +51,16 @@ public:
     void setY(double y);
     double z() const { return m_z; }
     void setZ(double z);
+    void set(double x, double y, double z);
 
     //! Make this vector a unit vector
-    void unitify();
+    RayVector & unitify();
 
     //! Compute the dot product of this vector with another
     double dot(const RayVector & other) const;
+    
+    //! Compute the cross product of this vector and another
+    RayVector cross(const RayVector & other) const;
 
     //! Compute the length of this vector
     double length() const { return m_length; }
@@ -70,6 +75,18 @@ public:
     
     /** Unary negation - reverse direction of this vector */
     RayVector operator-() const;
+    
+    /** Scalar multiply / divide */
+    RayVector operator*(const double scalar) const;
+    friend RayVector operator*(const double scalar, const RayVector & vec);
+    RayVector operator/(const double scalar) const;
+    
+    /** Check if this vector is equivalent to another, wich some tolerance
+     *  for rounding error */
+    bool operator==(const RayVector &other) const;
+    
+    //! Print vec to a string, and return the string
+    char* snprint(char* buf, int maxLen) const;
     
 protected:
     //! Calculates current length of this vector

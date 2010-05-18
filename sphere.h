@@ -25,6 +25,9 @@
 
 #include "rayObject.h"
 
+class Ray;
+class World;
+
 class Sphere : public RayObject {
 public:
     Sphere() : RayObject() 
@@ -32,11 +35,11 @@ public:
     Sphere(const Coord& origin, double radius) : RayObject(origin,radius) 
         {}
 	
-    virtual void colour(Ray & inbound);
+    virtual bool colour(Ray * inbound, World * world);
 	
 protected:
     
-    virtual bool intersectsFine(Ray & inbound);
+    virtual bool intersectsFine(Ray * inbound);
 };
 
 #endif // sphere_h_

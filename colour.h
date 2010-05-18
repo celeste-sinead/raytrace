@@ -2,10 +2,19 @@
  * colour.h
  * Copyright 2010 Iain Peet
  *
- * Defines a colour, for the purposes of raytracing calculations.  Use double
+ * Defines colour objects used in raytracing.
+ *
+ * The RayColour class is intended for ray trace calculations.  It uses double
  * precision math to track colours within graphics space.  These are unbounded
  * intensity values, which may be translated to a more subjective colour space
  * just in time for display.
+ *
+ * The DisplayColour class is a more typical RGB colour class.  It uses 
+ * double values in the range [0.0,1.0] to represent RGB colour components.
+ * 
+ * Also defined are the ColourAdapter classes, which implement various
+ * schemes for translating between the high dynamic range RayColour and the
+ * display-friendly DisplayColour.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -28,7 +37,8 @@
 
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
-struct RayColour {
+class RayColour {
+public:
     /** RGB intensity.  These are in range [0.0,infinity] */
     double r;
     double g;
@@ -37,11 +47,17 @@ struct RayColour {
     RayColour() : r(0.0), g(0.0), b(0.0)                                  { /* n/a */ }
     RayColour(double cr, double cg, double cb) : r(cr), g(cg), b(cb)      { /* n/a */ }
     RayColour(const RayColour &other) : r(other.r), g(other.g), b(other.b) { /* n/a */ }
+    
+    void set(double r, double g, double b);
+    
+    //! Print this colour to a string, with maximum length.  Return the string.
+    char* snprint(char* buf, int maxLen) const;
 };
 
 /** A color, for displaying.  Functions for transforming from internal ray colors
  *  to display colors are included.  (They're rather arbitrary!) */
-struct DisplayColour {
+class DisplayColour {
+public:
     /** RGB intensity.  Kept in double precision, in the range [0,1.0], so we can
      *  easily convert to arbitrary integer color depth */
     double r;
@@ -56,10 +72,22 @@ struct DisplayColour {
     unsigned long blue(unsigned int depth)
         { return b*(1<<depth); }
 
-    /********* Various conversion functions **********/
+};
 
-    /** Convert using a linear scale.  Simple, easy, and not very pretty */
-    void fromRayLinear(const RayColour & colour, double maximum);
+/** Provides a strategy for converting between a high dynamic range RayColour
+ *  and a displayable DisplayColour */
+class ColourAdapter {
+public:
+    virtual void convert(RayColour * source, DisplayColour * dest) = 0;  
+};
+
+/** Implements a simple linear scaling */
+class LinearColourAdapter {
+public:
+    //! Maximum in the range of scaled RayColour intensities
+    double m_max;  
+  
+    virtual void convert(RayColour * source, DisplayColour * dest);
 };
 
 #endif

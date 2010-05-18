@@ -29,7 +29,9 @@
 #define ray_object_h_
 
 #include "geom.h"
-#include "ray.h"
+
+class Ray;
+class World;
 
 /** Base class for all elements in the graphics universe which can intersect
  *  with rays.  Provides bookkeeping infrastructure and coarse ray intersect
@@ -61,12 +63,15 @@ public:
      *  This function is re-entrant.
      *  @param inbound  The ray to check for intersection.
      *  @return         true if inbound intersects. false otherwise */
-    bool intersects(Ray & inbound);
+    bool intersects(Ray *inbound);
 
     /** Determines the colour of a colliding ray.
      *  @param inbound  The ray to colour.  Behaviour is undefined if this is 
      *                  a non-intersecting ray.  (collides(inbound)==false) */
-    virtual void colour(Ray & inbound) = 0;
+    virtual bool colour(Ray *inbound, World *world) = 0;
+    
+    const Coord& origin() const
+        {return m_origin;}
 
 protected:
     /** Accurately determines whether a ray intersects this object.
@@ -79,7 +84,7 @@ protected:
      *  by this object. 
      *  @param inbound  The ray to check for intersection.
      *  @return         true if inbound intersects.  false otherwise. */
-    virtual bool intersectsFine(Ray &inbound) = 0;
+    virtual bool intersectsFine(Ray *inbound) = 0;
 
 };
 

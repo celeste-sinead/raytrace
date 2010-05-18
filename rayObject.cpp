@@ -24,19 +24,19 @@
 #include <math.h>
 #include <iputil/trace.h>
 
+#include "ray.h"
 #include "rayObject.h"
 
 static trc_ctl_t rayObjectTrc = {
-    TRC_WARN,
+    TRC_DFL_LVL,
     "RAY-OBJ",
     TRC_DFL_PRINT
 };
 #define TRACE(level, args...) \
     trc_printf(&rayObjectTrc,(level),1,args)
 
-
 //! Checks if a ray intersects this object.  
-bool RayObject::intersects(Ray& inbound)
+bool RayObject::intersects(Ray *inbound)
 {
     /* First, the coarse intersection check.  
      * Idea is simple - we find the minimum distance from the ray
@@ -46,12 +46,12 @@ bool RayObject::intersects(Ray& inbound)
      * more exact check. */
   
     // Vector from ray endpoint to centre of sphere
-    RayVector toCent = m_origin - inbound.m_endpoint;
+    RayVector toCent = m_origin - inbound->m_endpoint;
     // toCent is the hypotenuse of the right triangle
     double hypotenuse = toCent.length();
     /* Dot product projects toCent onto the unit vector of the
      * adjacent edge, giving us the adjacent length */
-    double adjacent = inbound.m_dir.dot(toCent);
+    double adjacent = inbound->m_dir.dot(toCent);
     /* Negative result means the vector is pointing *away* from the center
      * of the sphere */
     if(adjacent <= 0.0) {

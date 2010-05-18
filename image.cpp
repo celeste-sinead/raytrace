@@ -21,76 +21,26 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>
 *****************************************************************************/
 
+#include <iputil/unit.h>
+
 #include "image.h"
 #include "colour.h"
 
-RayImage::RayImage(int width, int height, RayColour * fillColour) :
-    m_width(0),
-    m_height(0),
-    m_pixels(0)
+//! Converts a RayImage to Ascii
+void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold)
 {
-    setSize(width,height);
-    if(fillColour) fill(*fillColour);
-}
-
-//! Resize the image
-void RayImage::setSize(int width, int height, RayColour* fillColour) {
-    /* Allocate new outer array */
-    RayColour ** newPixels = new RayColour * [width];
-    if(!newPixels) {
-	freePix();
-	return;
-    }
-    
-    /* Allocate columns */
-    for(int i=0; i<width; ++i) {
-	newPixels[i] = new RayColour [height];
-	if( !newPixels[i]) {
-	    /* Alloc failed.  Unroll and get out.*/
-	    while( --i >= 0 ) delete [] newPixels[i];
-	    delete newPixels;
-	    freePix();
-	    return;
-	}
-    }
-    
-    /* Copy old data / fill with background */
-    for(int i=0; i<width; ++i) {
-	for(int j=0; j<height; ++j) {
-	    if( (i<m_width) && (j<m_height) ) {
-	        newPixels[i][j] = m_pixels[i][j];   
-	    } else if( fillColour ) {
-		newPixels[i][j] = *fillColour;
-	    }
-	}
-    }
-    
-    // Free old data 
-    freePix();
-    // And add new data
-    m_pixels = newPixels;
-    m_width =  width;
-    m_height = height;
-}
-
-//! Fill the image with a pretty colour
-void RayImage::fill(RayColour& fillColour)
-{
-    for(int i=0; i<m_width; ++i) {
-	for(int j=0; j<m_height; ++j) {
-	    m_pixels[i][j] = fillColour;   
+    double intensity;
+    for( int i=0; (i<ray->width()) && (i<width()); ++i ) {
+        for( int j=0; (j<ray->height()) && (j<height()); ++j ) {
+	    intensity = (ray->at(i,j)).b + (ray->at(i,j)).g + (ray->at(i,j)).r;
+	    intensity /= 3.0;
+	    at(i,j) = (intensity>=threshold) ? ' ' : 'X';
 	}
     }
 }
 
-//! Frees all memory
-void RayImage::freePix()
+//! Prints this image to a file
+void AsciiImage::print(FILE* outFile)
 {
-    for(int i=0; i<m_width; ++i)
-	delete [] m_pixels[i];
     
-    m_width = 0;
-    m_height = 0;
 }
-
-

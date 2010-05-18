@@ -20,15 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
+#include <cstdio>
+
 #include "colour.h"
 
-//! Converts from a RayColour on a straight linear scale
-void DisplayColour::fromRayLinear(const RayColour& colour, double maximum)
+//! Set all components of the colour
+void RayColour::set(double r, double g, double b)
 {
-    r = colour.r / maximum;
-    if(r>1.0) r=1.0;
-    g = colour.g / maximum;
-    if(g>1.0) g=1.0;
-    b = colour.b / maximum;
-    if(b>1.0) b = 1.0;
+    this->r = r;
+    this->g = g;
+    this->b = b;
 }
+
+//! Print this colour to a string
+char* RayColour::snprint(char *buf, int maxLen) const
+{
+    snprintf(buf,maxLen,"R:%.03f G:%.03f B:%.03f",r,g,b);
+    buf[maxLen-1] = '\0';
+    return buf;
+}
+
+//! Straightforward linear colour conversion
+void LinearColourAdapter::convert(RayColour* source, DisplayColour* dest)
+{
+    dest->r = source->r / m_max;
+    if( dest->r > 1.0 ) dest->r = 1.0;
+    dest->g = source->g / m_max;
+    if( dest->g > 1.0 ) dest->g = 1.0;
+    dest->b = source->b / m_max;
+    if( dest->b > 1.0 ) dest->b = 1.0;
+}
+
