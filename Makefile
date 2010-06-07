@@ -5,6 +5,7 @@ LIBS= -lm -liputil
 .SECONDEXPANSION:
 
 BINARIES= rayTest
+DEPSDIR= deps
 
 all: $(BINARIES) depends
 
@@ -29,9 +30,9 @@ $(CXX_OBJS): $$(patsubst %.o,%.cpp,$$(@))
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(@:.o=.cpp) -c -o $(@) 
 
 # Set up .cpp dependency generation
-CXX_DEPENDS=$(CXX_SRCS:.cpp=.d)
-$(CXX_DEPENDS): $$(patsubst %.d,%.cpp,$$@)
-	$(CXX) -MM $(@:.d=.cpp) -o $(@)
+CXX_DEPENDS=$(patsubst %.cpp,$(DEPSDIR)/%.d,$(CXX_SRCS))
+$(CXX_DEPENDS): $$(patsubst $(DEPSDIR)/%.d,%.cpp,$$@)
+	$(CXX) -MM $(patsubst $(DEPSDIR)/%.d,%.cpp,$@) -o $(@)
 .phony = depends
 depends: $(CXX_DEPENDS)
 
@@ -46,7 +47,7 @@ test: rayTest
 	./rayTest
 
 .phony = clean
-clean: ; rm -f *.o *.d $(BINARIES)
+clean: ; rm -f *.o $(DEPSDIR)/*.d $(BINARIES)
 
 .phony = debug_vars
 debug_vars: 
