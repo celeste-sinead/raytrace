@@ -37,7 +37,7 @@
 using std::vector;
 
 static trc_ctl_t viewTrace = {
-    TRC_DTL,
+    TRC_DFL_LVL,
     "VIEW",
     TRC_STDOUT
 };
@@ -62,11 +62,20 @@ void ParallelView::render(RayImage* image, World *world)
     TRACE(TRC_STAT,"Ray direction: %s\n",r.m_dir.snprint(trcbuf,36));
 
     /* Render the image */
+    // The proportion of the width vector that is the distance from one pixel 
+    // to the next
+    double pixStepX = 1.0/rImage.width();
+    double pixStepY = 1.0/rImage.height();
     for(int i=0; i<rImage.width(); i+=1) {
         for(int j=0; j<rImage.height(); j+=1) {
-	    r.m_endpoint = m_origin 
-	        + ((double)i/rImage.width())*m_xVec
-	        + ((double)j/rImage.height())*m_yVec;
+	    double xDist =
+	        pixStepX/2.0 // middle of pixel
+	        + pixStepX*i; // which pixel
+	    double yDist = 
+	        pixStepY/2.0 
+	        + pixStepY*j;
+	    
+	    r.m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
 	    TRACE(TRC_INFO,"Pixel endpoint: %s\n",
 		  r.m_endpoint.snprint(trcbuf,36));
 	    world->trace(&r);

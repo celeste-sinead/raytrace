@@ -35,7 +35,6 @@ $(CXX_DEPENDS): $$(patsubst $(DEPSDIR)/%.d,%.cpp,$$@)
 	$(CXX) -MM $(patsubst $(DEPSDIR)/%.d,%.cpp,$@) -o $(@)
 .phony = depends
 depends: $(CXX_DEPENDS)
-
 -include $(CXX_DEPENDS)
 
 # Build test binary

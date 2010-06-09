@@ -62,12 +62,16 @@ void single_sphere() {
     world.push_back(&sph);
     
     ParallelView view;
-    view.m_origin = Coord(2,-1,1);
-    view.m_xVec = RayVector(0,2,0);
-    view.m_yVec = RayVector(0,0,-2);
+    view.m_origin = Coord(2,-1.5,1.5);
+    view.m_xVec = RayVector(0,3,0);
+    view.m_yVec = RayVector(0,0,-3);
     
     RayColour fill (0,0,1);
-    RayImage image (6,6,&fill);
+    RayImage image (64,32,&fill);
     
     view.render(&image, &world);
+    
+    AsciiImage ascii(64,32);
+    ascii.fromRay(&image,0,0.5);
+    ascii.print();
 }

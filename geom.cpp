@@ -187,6 +187,6 @@ START_TEST_FN(vector_geom,"Vector Algebra")
     cross = vec1.cross(vec2);
     TEST_CONDITION( (fabs(vec1.dot(cross)) < 1E-3)
         && ( fabs(vec2.dot(cross)) < 1E-3 ),
-	"check s x p\n\n");
+	"check ( s x p ) . s = 0\n\n");
     
 END_TEST_FN

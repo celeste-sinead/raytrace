@@ -21,6 +21,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>
 *****************************************************************************/
 
+#include <cstdio>
 #include <iputil/unit.h>
 
 #include "image.h"
@@ -42,5 +43,10 @@ void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold
 //! Prints this image to a file
 void AsciiImage::print(FILE* outFile)
 {
-    
+    for( int y=0; y<height(); ++y) {
+        for( int x=0; x<width(); ++x ) {
+	    fprintf(outFile,"%c",at(x,y)); 
+	}
+	fprintf(outFile,"\n");
+    }
 }

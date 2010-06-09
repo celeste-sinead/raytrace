@@ -96,85 +96,10 @@ public:
     void print( FILE * outFile = stdout );
 };
 
-
-/** ImageData implementation *************************************************/
-
-template<typename PixT>
-ImageData<PixT>::ImageData(int width, int height, PixT *fillColour) :
-    m_width(0),
-    m_height(0),
-    m_pixels(0)
-{
-    setSize(width,height);
-    if(fillColour) fill(*fillColour);
-}
-
-template<typename PixT>
-ImageData<PixT>::~ImageData() {
-    freePix();  
-}
-
-//! Resize the image
-template<typename PixT>
-void ImageData<PixT>::setSize(int width, int height, PixT *fillColour) {
-    /* Allocate new outer array */
-    PixT ** newPixels = new PixT* [width];
-    if(!newPixels) {
-	freePix();
-	return;
-    }
-    
-    /* Allocate columns */
-    for(int i=0; i<width; ++i) {
-	newPixels[i] = new PixT [height];
-	if( !newPixels[i]) {
-	    /* Alloc failed.  Unroll and get out.*/
-	    while( --i >= 0 ) delete [] newPixels[i];
-	    delete newPixels;
-	    freePix();
-	    return;
-	}
-    }
-    
-    /* Copy old data / fill with background */
-    for(int i=0; i<width; ++i) {
-	for(int j=0; j<height; ++j) {
-	    if( (i<m_width) && (j<m_height) ) {
-	        newPixels[i][j] = m_pixels[i][j];   
-	    } else if( fillColour ) {
-		newPixels[i][j] = *fillColour;
-	    }
-	}
-    }
-    
-    // Free old data 
-    freePix();
-    // And add new data
-    m_pixels = newPixels;
-    m_width =  width;
-    m_height = height;
-}
-
-//! Fill the image with a pretty colour
-template<typename PixT>
-void ImageData<PixT>::fill(PixT& fillColour)
-{
-    for(int i=0; i<m_width; ++i) {
-	for(int j=0; j<m_height; ++j) {
-	    m_pixels[i][j] = fillColour;   
-	}
-    }
-}
-
-//! Frees all memory
-template<typename PixT>
-void ImageData<PixT>::freePix()
-{
-    for(int i=0; i<m_width; ++i)
-	delete [] m_pixels[i];
-    
-    m_width = 0;
-    m_height = 0;
-}
+//! Include template function definitions
+// inside_image_h_ is used to protect against inclusion elsewhere
+#define inside_image_h_
+#include "image.template.h"
+#undef inside_image_h_
 
 #endif //image_h_

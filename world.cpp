@@ -34,7 +34,7 @@
 using std::vector;
 
 static trc_ctl_t worldTrace = {
-    TRC_DTL,
+    TRC_DFL_LVL,
     "WORLD",
     TRC_STDOUT
 };
