@@ -1,7 +1,7 @@
 CXX= g++
 CXXFLAGS= -Wall -g3 -O0
 INCLUDES=
-LIBS= -lm -liputil
+LIBS= -lm -liputil -lSDL
 .SECONDEXPANSION:
 
 BINARIES= rayTest
@@ -17,7 +17,8 @@ COMMON_OBJS = \
     rayObject.o \
     sphere.o \
     view.o \
-    world.o
+    world.o \
+    sdlManager.o 
 
 RAYTEST_OBJS= \
     $(COMMON_OBJS) \
