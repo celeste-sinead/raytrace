@@ -26,6 +26,7 @@
 
 #include "image.h"
 #include "colour.h"
+#include "sdlManager.h"
 
 //! Converts a RayImage to Ascii
 void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold)
@@ -50,3 +51,25 @@ void AsciiImage::print(FILE* outFile)
 	fprintf(outFile,"\n");
     }
 }
+
+SDLImage::SDLImage(int width, int height, DisplayColour *fill) :
+        m_surface(0),
+        m_width(width),
+        m_height(height)
+{  
+    /* Stub */
+}
+
+SDLImage::~SDLImage() {
+    /* Stub */
+}
+
+bool SDLImage::canDisplay() {
+    /* Stub */
+    return false;
+}
+
+void SDLImage::display() {
+    /* Stub */
+}
+

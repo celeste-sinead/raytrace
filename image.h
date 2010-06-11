@@ -26,6 +26,11 @@
 
 #include <cstdio>
 
+class RayColour;
+class DisplayColour;
+class ColourAdapter;
+struct SDL_Surface;
+
 /** Image base template, which provides data storage functionality
  *  to image classes 
  *  As per convention in images, pixels are indexed such that 
@@ -65,9 +70,6 @@ private:
     void freePix();
 };
 
-class RayColour;
-class ColourAdapter;
-
 /** An image containing pixels with raytracing colour domain colours */
 class RayImage : public ImageData<RayColour> {
 public:
@@ -94,6 +96,32 @@ public:
     
     //! Prints the ascii image to a file
     void print( FILE * outFile = stdout );
+};
+
+/** Wraps a SDL_Surface, which might be displayed through libsdl */
+class SDLImage {
+private:
+    SDL_Surface  * m_surface;
+    int            m_width;
+    int            m_height;
+
+public:
+    SDLImage(int width=0, int height=0, DisplayColour *fillColour=0);
+    ~SDLImage();
+
+    /** Convert from a RayImage. 
+     *  @param ray       The RayImage to convert from
+     *  @param adapter   The colour adapter to use
+     *  @param threshold The minimum DisplayColour intensity to consider
+     *                   'bright'  (RGB are averaged to get intensity) */
+    void fromRay( RayImage * ray, ColourAdapter * adapter, double threshold);
+    
+    /** Checks if SDL has been initialized, and that the resolution of the
+     *  image is displayable */
+    bool canDisplay();
+
+    /** Displays this image in the SDL video surface */
+    void display();
 };
 
 //! Include template function definitions

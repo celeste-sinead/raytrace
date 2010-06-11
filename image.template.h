@@ -48,31 +48,31 @@ void ImageData<PixT>::setSize(int width, int height, PixT *fillColour) {
     /* Allocate new outer array */
     PixT ** newPixels = new PixT* [width];
     if(!newPixels) {
-	freePix();
-	return;
+	    freePix();
+	    return;
     }
     
     /* Allocate columns */
     for(int i=0; i<width; ++i) {
-	newPixels[i] = new PixT [height];
-	if( !newPixels[i]) {
-	    /* Alloc failed.  Unroll and get out.*/
-	    while( --i >= 0 ) delete [] newPixels[i];
-	    delete newPixels;
-	    freePix();
-	    return;
-	}
+	    newPixels[i] = new PixT [height];
+	    if( !newPixels[i]) {
+	        /* Alloc failed.  Unroll and get out.*/
+	        while( --i >= 0 ) delete [] newPixels[i];
+	        delete newPixels;
+	        freePix();
+	        return;
+    	}
     }
     
     /* Copy old data / fill with background */
     for(int i=0; i<width; ++i) {
-	for(int j=0; j<height; ++j) {
-	    if( (i<m_width) && (j<m_height) ) {
-	        newPixels[i][j] = m_pixels[i][j];   
-	    } else if( fillColour ) {
-		newPixels[i][j] = *fillColour;
+    	for(int j=0; j<height; ++j) {
+	        if( (i<m_width) && (j<m_height) ) {
+	            newPixels[i][j] = m_pixels[i][j];   
+    	    } else if( fillColour ) {
+	    	newPixels[i][j] = *fillColour;
+	        }
 	    }
-	}
     }
     
     // Free old data 
@@ -88,9 +88,9 @@ template<typename PixT>
 void ImageData<PixT>::fill(PixT& fillColour)
 {
     for(int i=0; i<m_width; ++i) {
-	for(int j=0; j<m_height; ++j) {
-	    m_pixels[i][j] = fillColour;   
-	}
+    	for(int j=0; j<m_height; ++j) {
+	        m_pixels[i][j] = fillColour;   
+	    }
     }
 }
 
@@ -99,8 +99,10 @@ template<typename PixT>
 void ImageData<PixT>::freePix()
 {
     for(int i=0; i<m_width; ++i)
-	delete [] m_pixels[i];
+	    delete [] m_pixels[i];
+    delete [] m_pixels;
     
+    m_pixels = 0;
     m_width = 0;
     m_height = 0;
 }
