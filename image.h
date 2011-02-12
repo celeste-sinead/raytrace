@@ -25,11 +25,16 @@
 #define image_h_
 
 #include <cstdio>
+#include <QColor>
+#include <QImage>
+#include <QObject>
+#include <QWidget>
 
-class RayColour;
+#include "colour.h"
+
 class DisplayColour;
 class ColourAdapter;
-struct SDL_Surface;
+class QPaintEvent;
 
 /** Image base template, which provides data storage functionality
  *  to image classes 
@@ -98,30 +103,22 @@ public:
     void print( FILE * outFile = stdout );
 };
 
-/** Wraps a SDL_Surface, which might be displayed through libsdl */
-class SDLImage {
+class DisplayImageQt : public QWidget { 
+Q_OBJECT
 private:
-    SDL_Surface  * m_surface;
-    int            m_width;
-    int            m_height;
+    QImage m_image;
+
+protected:
+    void paintEvent(QPaintEvent *event);
 
 public:
-    SDLImage(int width=0, int height=0, DisplayColour *fillColour=0);
-    ~SDLImage();
+    DisplayImageQt(int width=0, int height=0, const QColor &fill = Qt::black, QWidget *parent = 0);
+    virtual QSize sizeHint() const { return m_image.size(); }
 
-    /** Convert from a RayImage. 
-     *  @param ray       The RayImage to convert from
-     *  @param adapter   The colour adapter to use
-     *  @param threshold The minimum DisplayColour intensity to consider
-     *                   'bright'  (RGB are averaged to get intensity) */
-    void fromRay( RayImage * ray, ColourAdapter * adapter, double threshold);
-    
-    /** Checks if SDL has been initialized, and that the resolution of the
-     *  image is displayable */
-    bool canDisplay();
-
-    /** Displays this image in the SDL video surface */
-    void display();
+    /* Convert from a HDR RayImage
+     * @param ray     The RayImage to convert from
+     * @param adapter The colour converter to use */
+    void fromRay(RayImage * ray, ColourAdapter * adapter);
 };
 
 //! Include template function definitions

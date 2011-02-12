@@ -66,12 +66,11 @@ public:
 
     /** Convert to arbitrary integer color depth.  Depth is in bits */
     unsigned long red(unsigned int depth)
-        { return r*(1<<depth); }
+        { return r*((1<<depth) - 1); }
     unsigned long green(unsigned int depth)
-        { return g*(1<<depth); }
+        { return g*((1<<depth) - 1); }
     unsigned long blue(unsigned int depth)
-        { return b*(1<<depth); }
-
+        { return b*((1<<depth) - 1); }
 };
 
 /** Provides a strategy for converting between a high dynamic range RayColour
@@ -82,11 +81,13 @@ public:
 };
 
 /** Implements a simple linear scaling */
-class LinearColourAdapter {
-public:
+class LinearColourAdapter: public ColourAdapter {
+private:
     //! Maximum in the range of scaled RayColour intensities
     double m_max;  
-  
+public:
+	LinearColourAdapter(double max) : m_max(max) {}  
+
     virtual void convert(RayColour * source, DisplayColour * dest);
 };
 

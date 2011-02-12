@@ -31,7 +31,10 @@
 #include "view.h"
 #include "world.h"
 
-void single_sphere();
+#include <QtGui>
+
+void singleSphere();
+void qtTest(QApplication &app);
 
 int main(int argc, char *argv[]) {
     /** Run unit tests */
@@ -42,18 +45,17 @@ int main(int argc, char *argv[]) {
     
     END_TEST_RUNNER;
     
-    /** Execute subjective / interactive / arbitrary tests */
-    // break out if we're not running interactive tests
-    if( argc <= 1 || strncmp(argv[1],"interactive",11) ) return 0;
-    printf("\nRunning interactive tests...\n");
-    
-    single_sphere();
+    printf("Ascii Render:\n"); 
+    singleSphere();
+
+    QApplication app(argc, argv);
+    qtTest(app);
     
     printf("Done!\n");
     return 0;   
 }
 
-void single_sphere() {
+void singleSphere() {
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red
     world.m_backgroundColour.set(0,0,0); // black
@@ -74,4 +76,33 @@ void single_sphere() {
     AsciiImage ascii(64,32);
     ascii.fromRay(&image,0,0.5);
     ascii.print();
+
+}
+
+void qtTest(QApplication &app) {
+    const int w = 512;
+    const int h = 512;
+
+    World world;
+    world.m_defaultColour.set(1.0,0,0);  // bright red
+    world.m_backgroundColour.set(0,0,0); // black
+    
+    Sphere sph ( Coord(0,0,0), 1.0 );
+    world.push_back(&sph);
+    
+    ParallelView view;
+    view.m_origin = Coord(2,-1.5,1.5);
+    view.m_xVec = RayVector(0,3,0);
+    view.m_yVec = RayVector(0,0,-3);
+    
+    RayColour fill (0,0,1);
+    RayImage image (w, h, &fill);
+
+    view.render(&image, &world);
+
+    DisplayImageQt qtImage (w, h, Qt::blue);
+    LinearColourAdapter adapter (1.0);
+    qtImage.fromRay(&image, &adapter);
+    qtImage.show();
+    app.exec();
 }

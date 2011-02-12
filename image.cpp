@@ -24,9 +24,11 @@
 #include <cstdio>
 #include <iputil/unit.h>
 
+#include <QPaintEvent>
+#include <QPainter>
+
 #include "image.h"
 #include "colour.h"
-#include "sdlManager.h"
 
 //! Converts a RayImage to Ascii
 void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold)
@@ -34,10 +36,10 @@ void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold
     double intensity;
     for( int i=0; (i<ray->width()) && (i<width()); ++i ) {
         for( int j=0; (j<ray->height()) && (j<height()); ++j ) {
-	    intensity = (ray->at(i,j)).b + (ray->at(i,j)).g + (ray->at(i,j)).r;
-	    intensity /= 3.0;
-	    at(i,j) = (intensity>=threshold) ? ' ' : 'X';
-	}
+            intensity = (ray->at(i,j)).b + (ray->at(i,j)).g + (ray->at(i,j)).r;
+            intensity /= 3.0;
+            at(i,j) = (intensity>=threshold) ? ' ' : 'X';
+        }
     }
 }
 
@@ -46,30 +48,37 @@ void AsciiImage::print(FILE* outFile)
 {
     for( int y=0; y<height(); ++y) {
         for( int x=0; x<width(); ++x ) {
-	    fprintf(outFile,"%c",at(x,y)); 
-	}
-	fprintf(outFile,"\n");
+            fprintf(outFile,"%c",at(x,y)); 
+        }
+        fprintf(outFile,"\n");
     }
 }
 
-SDLImage::SDLImage(int width, int height, DisplayColour *fill) :
-        m_surface(0),
-        m_width(width),
-        m_height(height)
-{  
-    /* Stub */
+DisplayImageQt::DisplayImageQt(int width, int height, const QColor &fill, QWidget * parent) :
+    QWidget(parent),
+    m_image(width, height, QImage::Format_ARGB32)
+{ 
+    m_image.fill(fill.rgb());
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
 }
 
-SDLImage::~SDLImage() {
-    /* Stub */
+void DisplayImageQt::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.drawImage(QPoint(0,0), m_image);
 }
 
-bool SDLImage::canDisplay() {
-    /* Stub */
-    return false;
-}
-
-void SDLImage::display() {
-    /* Stub */
+void DisplayImageQt::fromRay(RayImage * ray, ColourAdapter * adapter)
+{
+    DisplayColour curC;
+    QColor qCurC;
+    for(int row=0; row < ray->height(); ++row) {
+        for(int col=0; col < ray->width(); ++col) {
+            adapter->convert(&(ray->at(col,row)), &curC);
+            qCurC = QColor(curC.red(8), curC.green(8), curC.blue(8));
+            m_image.setPixel(col, row, qCurC.rgb());
+        }
+    }
 }
 
