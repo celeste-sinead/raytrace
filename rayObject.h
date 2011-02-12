@@ -2,12 +2,13 @@
  * rayObject.h
  * Copyright 2010 Iain Peet
  *
- * Defines a raytracing object, which is any object which a ray might strike
- * and interact with.  The RayObject class provides infrastructure for managing
- * objects in the graphics universe.  It also provides the coarse intersect
- * detecttion, which allows us to check whether passes near an object very 
- * quickly.  Coarse intersect detection simply checks whether the ray passes
- * through a sphere containing the object (this is easy).
+ * Defines the bases of entities which 'exist' in the raytraced universe. 
+ * Currently, these objects consist of RayObjects and LightSources
+ *
+ * RayObjects are entities that can intersect and colour Rays.
+ *
+ * LightSources cannot directly interact with rays, but make some contribution
+ * to the intensity of light at any given point in the world.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -29,17 +30,36 @@
 #define ray_object_h_
 
 #include "geom.h"
+#include "colour.h"
 
 class Ray;
 class World;
 
-/** Base class for all elements in the graphics universe which can intersect
- *  with rays.  Provides bookkeeping infrastructure and coarse ray intersect
- *  detection.
- *  This class needs to be re-entrant during the rendering phase.  Multiple 
- *  worker threads should be able to use this class when tracing their rays
- *  without locking or races. */
+/** Abstract base for any objects which may be intersected by a ray. */
 class RayObject {
+public:
+    /** Determine the distance from the ray's origin to the
+     *  (nearest) intersection of the ray with this object 
+     *  @param inbound The ray whose interesect distance is reauired. 
+     *  @return        The intersect distance, if the ray intersects.
+     *                 -1.0 If the ray does not intersect. */
+    virtual double intersectDist(Ray *inbound) = 0;
+
+   
+    /* Determine the colour of a given ray.
+     * @param inbound The ray to colour.
+     * @param world   The world in which this object exists.  
+     * @return        true if inbound intersects and has been coloured.
+     *                false if inbound does not actually intersect */
+    virtual bool colour(Ray *inbound, World *world) = 0;
+};
+
+
+/** Object providing methods for computing ray/sphere intersections.
+ *  In addition to being useful for spherical objects, these methods
+ *  are useful for coarse intersection checks for more complex
+ *  objects which can be circumscribed by a sphere */
+class BaseSphere : public RayObject {
 protected:
     //! Origin of this object. Center of a circumscribing sphere. 
     Coord     m_origin;
@@ -48,44 +68,35 @@ protected:
      *  though this will mean unnecessary fine intersect checks */
     double    m_radius;
 
+protected:
+    Coord intersectPoint(Ray* ray);
+    RayVector normal(const Coord &point);
+    double sphereIntersectDist(Ray* ray);
+
 public:
-    RayObject() : 
-        m_origin(),m_radius(0.0)
-        {}
-    RayObject(const Coord &origin, double radius) :
+    BaseSphere(const Coord& origin, double radius) : 
         m_origin(origin), m_radius(radius)
         {}
 
-    /** Check if a ray intersects with this object.  A coarse check is made 
-     *  to see if intersection can be ruled out quickly.  If the coarse check
-     *  show intersection is plausible, a fine check (provided by subclass) is
-     *  run to determine if the ray actually intersects.
-     *  This function is re-entrant.
-     *  @param inbound  The ray to check for intersection.
-     *  @return         true if inbound intersects. false otherwise */
-    bool intersects(Ray *inbound);
+    void setOrigin(const Coord& newOrig) { m_origin = newOrig; }
+    void setRadius(double newRad) { m_radius = newRad; }
+};
 
-    /** Determines the colour of a colliding ray.
-     *  @param inbound  The ray to colour.  Behaviour is undefined if this is 
-     *                  a non-intersecting ray.  (collides(inbound)==false) */
-    virtual bool colour(Ray *inbound, World *world) = 0;
-    
-    const Coord& origin() const
-        {return m_origin;}
+/** A solid sphere */
+class Sphere : public BaseSphere {
+private:
+    RayColour m_reflectivity;
 
-protected:
-    /** Accurately determines whether a ray intersects this object.
-     *  This is called by intersects() if coarse checks indicate the ray 
-     *  may intersect this object.  This function should, however, be valid
-     *  for any possible ray.
-     *  This function is expected to calculate the distance between the
-     *  point of intersection and the ray's origin, and record this information
-     *  in the Ray so that other RayObjects can determine if they are obscured
-     *  by this object. 
-     *  @param inbound  The ray to check for intersection.
-     *  @return         true if inbound intersects.  false otherwise. */
-    virtual bool intersectsFine(Ray *inbound) = 0;
+public:
+    Sphere(const Coord& origin, double radius, const RayColour& reflectivity):
+        BaseSphere(origin, radius), m_reflectivity(reflectivity)
+        {}
 
+    void setReflectivity(const RayColour& newRef) { m_reflectivity = newRef; }
+
+    virtual double intersectDist(Ray* inbound)
+        { return sphereIntersectDist(inbound); }
+    virtual bool colour(Ray* inbound, World* world);
 };
 
 #endif // ray_object_h_

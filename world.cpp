@@ -63,27 +63,28 @@ bool World::trace(Ray* ray)
    
     /* See if the ray hits any objects */
     for(int i=0; i<size(); ++i) {
-        if( at(i)->intersects(ray) ) {
-	     double curDist = (at(i)->origin() - ray->m_endpoint).length();
-	     if(!closest) {
-	         closest = at(i);
-		 closestDist = curDist;
-	     } else if( curDist < closestDist ) {
-	         closestDist = curDist;
-	     }
-	}
+        double curDist = at(i)->intersectDist(ray);
+        TRACE(TRC_DTL, "Object %d distance: %f\n", i, curDist);
+
+        if(curDist>=0.0) { // Actually intersects
+            if( (!closest) || (curDist < closestDist) ) {
+                // First intersection, or smallest intersection yet
+                closest = at(i);
+                closestDist = curDist;
+            }
+        }
     }
     
     if( !closest ) {
         // Ray hits no objects, use background colour
-	TRACE(TRC_INFO,"Ray hit no objects, given background colour.\n");
-	ray->m_colour = m_backgroundColour;
-	return true;
+        TRACE(TRC_INFO,"Ray hit no objects, given background colour.\n");
+        ray->m_colour = m_backgroundColour;
+        return true;
     }
     
     if( closest->colour(ray,this) ) {
         // Found colour successfully
-	TRACE(TRC_INFO,"Got ray colour from intersect object.\n");
+        TRACE(TRC_INFO,"Got ray colour from intersect object.\n");
         return true;
     }
    

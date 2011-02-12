@@ -27,7 +27,7 @@
 #include "colour.h"
 #include "image.h"
 #include "ray.h"
-#include "sphere.h"
+#include "rayObject.h"
 #include "view.h"
 #include "world.h"
 
@@ -56,11 +56,14 @@ int main(int argc, char *argv[]) {
 }
 
 void singleSphere() {
+    const int w = 8;
+    const int h = 4;
+
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red
     world.m_backgroundColour.set(0,0,0); // black
     
-    Sphere sph ( Coord(0,0,0), 1.0 );
+    Sphere sph ( Coord(0,0,0), 1.0, RayColour(1.0,1.0,1.0) );
     world.push_back(&sph);
     
     ParallelView view;
@@ -69,11 +72,11 @@ void singleSphere() {
     view.m_yVec = RayVector(0,0,-3);
     
     RayColour fill (0,0,1);
-    RayImage image (64,32,&fill);
+    RayImage image (w, h, &fill);
     
     view.render(&image, &world);
     
-    AsciiImage ascii(64,32);
+    AsciiImage ascii(w, h);
     ascii.fromRay(&image,0,0.5);
     ascii.print();
 
@@ -87,7 +90,7 @@ void qtTest(QApplication &app) {
     world.m_defaultColour.set(1.0,0,0);  // bright red
     world.m_backgroundColour.set(0,0,0); // black
     
-    Sphere sph ( Coord(0,0,0), 1.0 );
+    Sphere sph ( Coord(0,0,0), 1.0, RayColour(0.0, 0.6, 1.0) );
     world.push_back(&sph);
     
     ParallelView view;

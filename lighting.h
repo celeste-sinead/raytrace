@@ -1,8 +1,8 @@
 /******************************************************************************
- * sphere.h
- * Copyright 2010 Iain Peet
+ * lighting.h
+ * Copyright 2011 Iain Peet
  *
- * A RayObject which is a simple, spherical solid.
+ * Description
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -20,26 +20,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef sphere_h_
-#define sphere_h_
+#ifndef LIGHTING_H_
+#define LIGHTING_H_
 
-#include "rayObject.h"
-
-class Ray;
-class World;
-
-class Sphere : public RayObject {
+/** Expresses a particular lighting condition.  Lighting
+ *  has both intensity and direction */
+class Lighting {
 public:
-    Sphere() : RayObject() 
+    RayVector m_dir;
+    RayColour m_intensity;
+
+public:
+    Lighting(const RayVector &dir, const RayColour &color):
+        m_dir(dir), m_color(color)
         {}
-    Sphere(const Coord& origin, double radius) : RayObject(origin,radius) 
-        {}
-	
-    virtual bool colour(Ray * inbound, World * world);
-	
-protected:
-    
-    virtual bool intersectsFine(Ray * inbound);
 };
 
-#endif // sphere_h_
+/** Abstract base for light sources. */
+class LightSource {
+    /** Determine this light source's contribution to lighting at a 
+     *  given point in the world.
+     *  @param  point The point where lighting should be evaluated 
+     *  @return The intensity of light at the point */
+    virtual Lighting lightingAt(Coord* point) = 0;
+};
+
+#endif // LIGHTING_H_
+

@@ -19,7 +19,6 @@ COMMON_OBJS= \
     image.o \
     ray.o \
     rayObject.o \
-    sphere.o \
     view.o \
     world.o 
 
