@@ -21,9 +21,11 @@
  *****************************************************************************/
 
 #include <cstdio>
+#include <cstdlib>
 
 #include "colour.h"
 #include "ray.h"
+#include "image.h"
 
 //! Set all components of the colour
 void RayColour::set(double r, double g, double b)
@@ -45,6 +47,14 @@ RayColour operator*(double left, const RayColour & other)
 {
     return RayColour(left*other.r, left*other.g, left*other.b);
 }
+double& RayColour::operator[](int inx) {
+    switch(inx) {
+        case 0: return r;
+        case 1: return g;
+        case 2: return b;
+        default: abort();
+    };
+}
 
 //! Print this colour to a string
 char* RayColour::snprint(char *buf, int maxLen) const
@@ -62,14 +72,38 @@ void DisplayColour::set(double r, double g, double b)
     this->b = b;
 }
 
+//! Find max and min in image, for conversion range
+LinearColourAdapter::LinearColourAdapter(RayImage *image)
+{
+    if( (image->width()==0) || (image->height() == 0) ) {
+        m_min = 0.0;
+        m_max = 1.0;
+        return;
+    }
+
+    m_min = image->at(0,0).m_colour[0];
+    m_max = image->at(0,0).m_colour[0];
+    for(int i=0; i<image->width(); ++i) {
+        for(int j=0; j<image->height(); ++j) {
+            for(int k=0; k<3; ++k) {
+                if( image->at(i,j).m_colour[k] < m_min ) 
+                    m_min = image->at(i,j).m_colour[k];
+                if( image->at(i,j).m_colour[k] > m_max )
+                    m_max = image->at(i,j).m_colour[k];
+            }
+        }
+    }
+
+}
+
 //! Straightforward linear colour conversion
 void LinearColourAdapter::convert(Ray* source, DisplayColour* dest)
 {
-    dest->r = source->m_colour.r / m_max;
+    dest->r = (source->m_colour.r-m_min) / (m_max-m_min);
     if( dest->r > 1.0 ) dest->r = 1.0;
-    dest->g = source->m_colour.g / m_max;
+    dest->g = (source->m_colour.g-m_min) / (m_max-m_min);
     if( dest->g > 1.0 ) dest->g = 1.0;
-    dest->b = source->m_colour.b / m_max;
+    dest->b = (source->m_colour.b-m_min) / (m_max-m_min);
     if( dest->b > 1.0 ) dest->b = 1.0;
 }
 

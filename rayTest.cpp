@@ -112,7 +112,7 @@ void qtTest(QApplication &app) {
     depthImage->fromRay(&image, &depth);
 
     DisplayImageQt *visImage = new DisplayImageQt(w, h, Qt::blue);
-    LinearColourAdapter colour (1.0);
+    LinearColourAdapter colour (&image);
     visImage->fromRay(&image, &colour);
 
     QHBoxLayout *imgs = new QHBoxLayout();

@@ -36,6 +36,7 @@
 #define colour_h_
 
 class Ray;
+class RayImage;
 
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
@@ -57,6 +58,9 @@ public:
     //! Scaling:
     RayColour operator*(double other);
     friend RayColour operator*(double right, const RayColour& left);
+    //! Access colours r, g, b
+    double& operator[](int inx);
+
     
     //! Print this colour to a string, with maximum length.  Return the string.
     char* snprint(char* buf, int maxLen) const;
@@ -98,10 +102,14 @@ public:
 /** Implements a simple linear scaling */
 class LinearColourAdapter: public ColourAdapter {
 private:
-    //! Maximum in the range of scaled RayColour intensities
+    /** Range of intensities for linear range: */
+    double m_min;
     double m_max;  
 public:
-	LinearColourAdapter(double max) : m_max(max) {}  
+	LinearColourAdapter(double min, double max) : 
+        m_min(min), m_max(max) 
+        {}  
+    LinearColourAdapter(RayImage *image);
 
     virtual void convert(Ray * source, DisplayColour * dest);
 };
