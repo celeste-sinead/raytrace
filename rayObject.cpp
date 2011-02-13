@@ -92,7 +92,7 @@ RayVector BaseSphere::normal(const Coord &point) {
 //! Colour a ray
 bool Sphere::colour(Ray* inbound, World* world) {
     // Diffuse light:
-    RayColour colour = m_reflectivity * world->m_globalDiffuse;
+    RayColour colour = m_diffusivity * world->m_globalDiffuse;
 
     /* Add contributions of all light sources */
     RayVector intersect = inbound->m_endpoint + 
@@ -104,7 +104,7 @@ bool Sphere::colour(Ray* inbound, World* world) {
         double scale = cur.m_dir.dot(interNorm);
         if(scale<0.0) scale = 0.0;
         
-        colour = colour + (m_reflectivity * cur.m_intensity * scale);
+        colour = colour + (m_diffusivity * cur.m_intensity * scale);
     }
 
     inbound->m_colour = colour;

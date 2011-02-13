@@ -83,8 +83,8 @@ void singleSphere() {
 }
 
 void qtTest(QApplication &app) {
-    const int w = 512;
-    const int h = 512;
+    const int w = 650;
+    const int h = 650;
 
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red

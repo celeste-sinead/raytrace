@@ -83,15 +83,22 @@ public:
 
 /** A solid sphere */
 class Sphere : public BaseSphere {
-private:
-    RayColour m_reflectivity;
+public:
+    //! The gains this object applies to incident light, in all directions.
+    RayColour m_diffusivity;
+    //! The gains this object applies to reflected light
+    RayColour  m_reflectivity;
 
 public:
-    Sphere(const Coord& origin, double radius, const RayColour& reflectivity):
-        BaseSphere(origin, radius), m_reflectivity(reflectivity)
+    Sphere(const Coord& origin, 
+           double radius, 
+           const RayColour& diffusivity = RayColour(0,0,0),
+           const RayColour& reflectivity = RayColour(0,0,0)
+        ) :
+        BaseSphere(origin, radius),
+        m_diffusivity(diffusivity),
+        m_reflectivity(reflectivity)
         {}
-
-    void setReflectivity(const RayColour& newRef) { m_reflectivity = newRef; }
 
     virtual double intersectDist(Ray* inbound)
         { return sphereIntersectDist(inbound); }
