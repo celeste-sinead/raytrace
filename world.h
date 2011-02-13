@@ -41,8 +41,9 @@ private:
 public:
     //! Colour returned when a ray trace fails
     RayColour                m_defaultColour;
-    //! Colour of rays which hit no objects
-    RayColour                m_backgroundColour;
+    /** Diffuse light experienced by all objects.  This is also the background
+     *  colour that is set to any non-intersecting rays */
+    RayColour                m_globalDiffuse;
   
     /** Trace a ray.
      *  @param ray  The ray to trace.

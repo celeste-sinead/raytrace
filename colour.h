@@ -35,6 +35,8 @@
 #ifndef colour_h_
 #define colour_h_
 
+class Ray;
+
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
 class RayColour {
@@ -44,11 +46,17 @@ public:
     double g;
     double b;
 
-    RayColour() : r(0.0), g(0.0), b(0.0)                                  { /* n/a */ }
-    RayColour(double cr, double cg, double cb) : r(cr), g(cg), b(cb)      { /* n/a */ }
+    RayColour() : r(0.0), g(0.0), b(0.0)                                   { /* n/a */ }
+    RayColour(double cr, double cg, double cb) : r(cr), g(cg), b(cb)       { /* n/a */ }
     RayColour(const RayColour &other) : r(other.r), g(other.g), b(other.b) { /* n/a */ }
     
     void set(double r, double g, double b);
+
+    //! Elementwise multiplication:
+    RayColour operator*(const RayColour& other);
+    //! Scaling:
+    RayColour operator*(double other);
+    friend RayColour operator*(double right, const RayColour& left);
     
     //! Print this colour to a string, with maximum length.  Return the string.
     char* snprint(char* buf, int maxLen) const;
@@ -64,6 +72,9 @@ public:
     double g;
     double b;
 
+    /** Convenience to set all of the above */
+    void set(double r, double g, double b);
+
     /** Convert to arbitrary integer color depth.  Depth is in bits */
     unsigned long red(unsigned int depth)
         { return r*((1<<depth) - 1); }
@@ -77,7 +88,11 @@ public:
  *  and a displayable DisplayColour */
 class ColourAdapter {
 public:
-    virtual void convert(RayColour * source, DisplayColour * dest) = 0;  
+    /** Converts a traced ray (which should have colour, depth, child, etc.
+     *  information) into a displayable colour 
+     *  @param source The ray to colour
+     *  @param dest   The DisplayColour instance to fill */
+    virtual void convert(Ray * source, DisplayColour * dest) = 0;  
 };
 
 /** Implements a simple linear scaling */
@@ -88,7 +103,19 @@ private:
 public:
 	LinearColourAdapter(double max) : m_max(max) {}  
 
-    virtual void convert(RayColour * source, DisplayColour * dest);
+    virtual void convert(Ray * source, DisplayColour * dest);
+};
+
+/** Provides depth mapping */
+class DepthAdapter: public ColourAdapter {
+private:
+    //! Maximum depth (corresponds to black)
+    double m_maxDepth;
+
+public:
+    DepthAdapter(double maxDepth) : m_maxDepth(maxDepth) {}
+
+    virtual void convert(Ray * source, DisplayColour * dest);
 };
 
 #endif

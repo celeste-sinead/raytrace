@@ -61,6 +61,8 @@ public:
     RayVector   m_dir; 
     //! The point where this ray is observed
     Coord       m_endpoint;
+    //! Distance from endpoint to the first intersecting object
+    double      m_intersectDist;
     //! The colour of this ray
     RayColour   m_colour;
     

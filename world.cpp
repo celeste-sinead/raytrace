@@ -78,11 +78,13 @@ bool World::trace(Ray* ray)
     if( !closest ) {
         // Ray hits no objects, use background colour
         TRACE(TRC_INFO,"Ray hit no objects, given background colour.\n");
-        ray->m_colour = m_backgroundColour;
+        ray->m_colour = m_globalDiffuse;
+        ray->m_intersectDist = -1.0;
         return true;
     }
-    
-    if( closest->colour(ray,this) ) {
+
+    ray->m_intersectDist = closestDist;
+    if( closest->colour(ray, this) ) {
         // Found colour successfully
         TRACE(TRC_INFO,"Got ray colour from intersect object.\n");
         return true;

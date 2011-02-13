@@ -31,6 +31,7 @@
 #include <QWidget>
 
 #include "colour.h"
+#include "ray.h"
 
 class DisplayColour;
 class ColourAdapter;
@@ -75,11 +76,11 @@ private:
     void freePix();
 };
 
-/** An image containing pixels with raytracing colour domain colours */
-class RayImage : public ImageData<RayColour> {
+/** An image containing traced rays */
+class RayImage : public ImageData<Ray> {
 public:
-    RayImage( int width=0, int height=0, RayColour *fillColour=0) :
-        ImageData<RayColour>(width,height,fillColour)
+    RayImage( int width=0, int height=0, Ray* fillColour=0) :
+        ImageData<Ray>(width,height,fillColour)
         { }
 
 };

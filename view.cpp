@@ -52,14 +52,14 @@ void ParallelView::render(RayImage* image, World *world)
     // Create reference to image, for convenience
     RayImage & rImage = *image;
     
-    Ray r;
-    r.m_dir = m_xVec.cross(m_yVec).unitify();
+    RayVector viewDir = m_xVec.cross(m_yVec).unitify();
+
     TRACE(TRC_STAT,"Beginning ParallelView render.\n");
     TRACE(TRC_STAT,"Image size: %d x %d\n",rImage.width(),rImage.height());
     TRACE(TRC_STAT,"Origin: %s\n",m_origin.snprint(trcbuf,36));
     TRACE(TRC_STAT,"xVec: %s\n",m_xVec.snprint(trcbuf,36));
     TRACE(TRC_STAT,"yVec: %s\n",m_yVec.snprint(trcbuf,36));
-    TRACE(TRC_STAT,"Ray direction: %s\n",r.m_dir.snprint(trcbuf,36));
+    TRACE(TRC_STAT,"Ray direction: %s\n",viewDir.snprint(trcbuf,36));
 
     /* Render the image */
     // The proportion of the width vector that is the distance from one pixel 
@@ -68,20 +68,20 @@ void ParallelView::render(RayImage* image, World *world)
     double pixStepY = 1.0/rImage.height();
     for(int i=0; i<rImage.width(); i+=1) {
         for(int j=0; j<rImage.height(); j+=1) {
-	    double xDist =
-	        pixStepX/2.0 // middle of pixel
-	        + pixStepX*i; // which pixel
-	    double yDist = 
-	        pixStepY/2.0 
-	        + pixStepY*j;
-	    
-	    r.m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
-	    TRACE(TRC_INFO,"Pixel endpoint: %s\n",
-		  r.m_endpoint.snprint(trcbuf,36));
-	    world->trace(&r);
-	    rImage[i][j] = r.m_colour;
-	    TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
-		  i,j,rImage[i][j].snprint(trcbuf,32));
-	}
+            double xDist =
+                pixStepX/2.0 // middle of pixel
+                + pixStepX*i; // which pixel
+            double yDist = 
+                pixStepY/2.0 
+                + pixStepY*j;
+            
+        rImage.at(i,j).m_dir = viewDir;
+        rImage.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
+            TRACE(TRC_INFO,"Pixel endpoint: %s\n",
+                  rImage.at(i,j).m_endpoint.snprint(trcbuf,36));
+            world->trace(&rImage.at(i,j));
+            TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
+                  i,j,rImage[i][j].m_colour.snprint(trcbuf,32));
+        }
     }
 }

@@ -69,7 +69,6 @@ protected:
     double    m_radius;
 
 protected:
-    Coord intersectPoint(Ray* ray);
     RayVector normal(const Coord &point);
     double sphereIntersectDist(Ray* ray);
 

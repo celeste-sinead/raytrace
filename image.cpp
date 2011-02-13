@@ -36,7 +36,8 @@ void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold
     double intensity;
     for( int i=0; (i<ray->width()) && (i<width()); ++i ) {
         for( int j=0; (j<ray->height()) && (j<height()); ++j ) {
-            intensity = (ray->at(i,j)).b + (ray->at(i,j)).g + (ray->at(i,j)).r;
+            RayColour & curC = ray->at(i,j).m_colour;
+            intensity = curC.b + curC.g + curC.r;
             intensity /= 3.0;
             at(i,j) = (intensity>=threshold) ? ' ' : 'X';
         }

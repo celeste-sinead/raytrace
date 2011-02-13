@@ -40,54 +40,58 @@ static trc_ctl_t rayObjectTrc = {
 //! Checks if a ray intersects this object.  
 double BaseSphere::sphereIntersectDist(Ray *inbound)
 {
-    /* Idea is simple - we find the minimum distance from the ray
-     * to the centre of a sphere containing the object.  If this
-     * distance is greater than the sphere's radius, we know the
-     * ray does not intersect.  Otherwise, we need to make a 
-     * more exact check. */
-  
+    /* Find the intersections between the inbound unit vector and
+     * this sphere. You will need a whiteboard to verify.*/
+
     // Vector from ray endpoint to centre of sphere
     RayVector toCent = m_origin - inbound->m_endpoint;
-    // toCent is the hypotenuse of the right triangle
-    double hypotenuse = toCent.length();
-    /* Dot product projects toCent onto the unit vector of the
-     * adjacent edge, giving us the adjacent length */
-    double adjacent = inbound->m_dir.dot(toCent);
-    /* Negative result means the vector is pointing *away* from the center
-     * of the sphere */
-    if(adjacent <= 0.0) {
-        TRACE(TRC_DTL,"Coarse intersect adjacent: %f\n",adjacent);
-        return -1.0;
-    }
-    /* Find the length of the opposite edge, which is also the minimum
-     * distance between the ray and the centre of the sphere */
-    double minDist = sqrt( (hypotenuse*hypotenuse) - (adjacent*adjacent) );
-   
-    TRACE(TRC_DTL,"Coarse intersect min distance: %f\n",minDist);
-    if( minDist > (m_radius + m_radius*0.0001) /* (tolerance) */ ) {
+
+    // Square of the distance from ray encpoint to centre of sphere
+    double cSq = toCent.length();
+    cSq = cSq * cSq;
+
+    // Distance from ray endpoint to point nearest sphere centre
+    double D = inbound->m_dir.dot(toCent);
+
+    // Discriminant of the intersection distance quadratic:
+    double discr = (m_radius*m_radius) + (D*D) - cSq;
+
+    // Discriminant < 0 indicates no intersection
+    if(discr < 0) {
+        TRACE(TRC_DTL,"Ray misses sphere.");
         return -1.0;
     }
 
-#warning Stub!
-    return 1.0;
+    // Calculate the two intersect distances
+    double sqrtDiscr = sqrt(discr);
+    double d1 = D + sqrtDiscr;
+    double d2 = D - sqrtDiscr;
+    // Note that d2 < d1 always
+
+    if( (d1<0.0) && (d2<0.0) ) { 
+        // Both intersections are 'behind' the endpoint
+        TRACE(TRC_DTL,"Sphere is beyond ray endpoint.");
+        return -1.0;
+    }
+    // d2 is still behind enpoint, d1 is result
+    if( d2 < 0.0 ) {
+        TRACE(TRC_DTL,"Ray intersects sphere form inside, dist %f\n",d1);
+        return d1;
+    }
+    // both are ahead, d2 is smaller
+    TRACE(TRC_DTL,"Ray hits sphere, dist %f\n",d2);
+    return d2;
 }    
-
-//! Find the point where the ray intersects the sphere
-Coord BaseSphere::intersectPoint(Ray *inbound) {
-#warning Stub!
-    return Coord();
-}
 
 //! Find the normal vector at the intersection point
 RayVector BaseSphere::normal(const Coord &point) {
-#warning Stub!
-    return RayVector();
+    return (point - m_origin).unitify();
 }
 
 //! Colour a ray
 bool Sphere::colour(Ray* inbound, World* world) {
-#warning Stub!
-    inbound->m_colour = m_reflectivity;
+    RayColour colour = m_reflectivity * world->m_globalDiffuse;
+    inbound->m_colour = colour;
     return true;
 }
 

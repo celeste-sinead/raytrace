@@ -61,9 +61,9 @@ void singleSphere() {
 
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red
-    world.m_backgroundColour.set(0,0,0); // black
+    world.m_globalDiffuse.set(0.01,0.01,0.01); // white
     
-    Sphere sph ( Coord(0,0,0), 1.0, RayColour(1.0,1.0,1.0) );
+    Sphere sph ( Coord(0,0,0), 1.0, RayColour(100,100,100) );
     world.push_back(&sph);
     
     ParallelView view;
@@ -71,8 +71,7 @@ void singleSphere() {
     view.m_xVec = RayVector(0,3,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayColour fill (0,0,1);
-    RayImage image (w, h, &fill);
+    RayImage image (w, h);
     
     view.render(&image, &world);
     
@@ -88,24 +87,41 @@ void qtTest(QApplication &app) {
 
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red
-    world.m_backgroundColour.set(0,0,0); // black
+    world.m_globalDiffuse.set(0.05, 0.05, 0.15); // dark blue 
     
     Sphere sph ( Coord(0,0,0), 1.0, RayColour(0.0, 0.6, 1.0) );
     world.push_back(&sph);
+
+    Sphere sph2 ( Coord(1,1,1), 0.5, RayColour(0.8, 0.0, 0.4) );
+    world.push_back(&sph2);
+
+    Sphere sph3 ( Coord(0,-1, 0), 0.5, RayColour(0.0, 0.8, 0.0) );
+    world.push_back(&sph3);
     
     ParallelView view;
     view.m_origin = Coord(2,-1.5,1.5);
     view.m_xVec = RayVector(0,3,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayColour fill (0,0,1);
-    RayImage image (w, h, &fill);
+    RayImage image (w, h);
 
     view.render(&image, &world);
 
-    DisplayImageQt qtImage (w, h, Qt::blue);
-    LinearColourAdapter adapter (1.0);
-    qtImage.fromRay(&image, &adapter);
-    qtImage.show();
+    DisplayImageQt *depthImage = new DisplayImageQt(w, h, Qt::blue);
+    DepthAdapter depth (2.0);
+    depthImage->fromRay(&image, &depth);
+
+    DisplayImageQt *visImage = new DisplayImageQt(w, h, Qt::blue);
+    LinearColourAdapter colour (1.0);
+    visImage->fromRay(&image, &colour);
+
+    QHBoxLayout *imgs = new QHBoxLayout();
+    imgs->addWidget(depthImage);
+    imgs->addWidget(visImage);
+
+    QWidget *topWidget = new QWidget();
+    topWidget->setLayout(imgs);
+    topWidget->show();
+
     app.exec();
 }
