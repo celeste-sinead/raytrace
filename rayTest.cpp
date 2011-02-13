@@ -26,6 +26,7 @@
 
 #include "colour.h"
 #include "image.h"
+#include "lighting.h"
 #include "ray.h"
 #include "rayObject.h"
 #include "view.h"
@@ -64,7 +65,7 @@ void singleSphere() {
     world.m_globalDiffuse.set(0.01,0.01,0.01); // white
     
     Sphere sph ( Coord(0,0,0), 1.0, RayColour(100,100,100) );
-    world.push_back(&sph);
+    world.addObject(&sph);
     
     ParallelView view;
     view.m_origin = Coord(2,-1.5,1.5);
@@ -90,16 +91,25 @@ void qtTest(QApplication &app) {
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); // dark blue 
     
     Sphere sph ( Coord(0,0,0), 1.0, RayColour(0.0, 0.6, 1.0) );
-    world.push_back(&sph);
+    world.addObject(&sph);
 
-    Sphere sph2 ( Coord(1,1,1), 0.5, RayColour(0.8, 0.0, 0.4) );
-    world.push_back(&sph2);
+    Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, RayColour(0.8, 0.0, 0.4) );
+    world.addObject(&sph2);
 
     Sphere sph3 ( Coord(0,-1, 0), 0.5, RayColour(0.0, 0.8, 0.0) );
-    world.push_back(&sph3);
+    world.addObject(&sph3);
+
+    Sphere sph4( Coord(1,0.5,0.5), 0.75, RayColour(1.0, 0.0, 0.0) );
+    world.addObject(&sph4);
+
+    PointSource light1 ( RayColour(50.0,50.0,50.0), RayVector(1.5,-1.5,1.5) );
+    world.addLight(&light1);
+
+    PointSource light2 ( RayColour(100,100,100), RayVector(5,-1,-1) );
+    world.addLight(&light2);
     
     ParallelView view;
-    view.m_origin = Coord(2,-1.5,1.5);
+    view.m_origin = Coord(2.0,-1.5,1.5);
     view.m_xVec = RayVector(0,3,0);
     view.m_yVec = RayVector(0,0,-3);
     

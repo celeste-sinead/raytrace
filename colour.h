@@ -58,7 +58,10 @@ public:
     //! Scaling:
     RayColour operator*(double other);
     friend RayColour operator*(double right, const RayColour& left);
-    //! Access colours r, g, b
+    //! Elementwise addition/subtraction:
+    RayColour operator+(const RayColour& other);
+    RayColour operator-(const RayColour& other);
+    //! Access colours r, g, b (convenient for iteration)
     double& operator[](int inx);
 
     

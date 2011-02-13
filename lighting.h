@@ -2,7 +2,7 @@
  * lighting.h
  * Copyright 2011 Iain Peet
  *
- * Description
+ * Defines entities in the world which cast light on their surroundings.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -23,6 +23,11 @@
 #ifndef LIGHTING_H_
 #define LIGHTING_H_
 
+#include "geom.h"
+#include "colour.h"
+
+class World;
+
 /** Expresses a particular lighting condition.  Lighting
  *  has both intensity and direction */
 class Lighting {
@@ -31,18 +36,37 @@ public:
     RayColour m_intensity;
 
 public:
-    Lighting(const RayVector &dir, const RayColour &color):
-        m_dir(dir), m_color(color)
+    Lighting(): m_dir(), m_intensity() {}
+    Lighting(const RayVector &dir, const RayColour &intensity):
+        m_dir(dir), m_intensity(intensity)
+        {}
+    Lighting(const Lighting &other) :
+        m_dir(other.m_dir), m_intensity(other.m_intensity)
         {}
 };
 
 /** Abstract base for light sources. */
 class LightSource {
+public:
     /** Determine this light source's contribution to lighting at a 
      *  given point in the world.
      *  @param  point The point where lighting should be evaluated 
      *  @return The intensity of light at the point */
-    virtual Lighting lightingAt(Coord* point) = 0;
+    virtual Lighting lightingAt(Coord* point, World* world) = 0;
+};
+
+/** A simple point source of light. */
+class PointSource : public LightSource{
+private:
+    RayColour m_intensity;
+    RayVector m_origin;
+
+public:
+    PointSource(const RayColour &intensity, const RayVector &origin):
+        m_intensity(intensity), m_origin(origin)
+        {}
+
+    virtual Lighting lightingAt(Coord* point, World* world);
 };
 
 #endif // LIGHTING_H_

@@ -17,6 +17,7 @@ COMMON_OBJS= \
     colour.o \
     geom.o \
     image.o \
+	lighting.o \
     ray.o \
     rayObject.o \
     view.o \

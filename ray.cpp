@@ -33,3 +33,10 @@ Ray* Ray::createParent()
     newParent->m_depth = m_depth + 1;
     return newParent;
 }
+
+//! Moves the origin of the ray a little bit.
+void Ray::nudge(double distance)
+{
+    m_endpoint = m_endpoint + distance * m_dir;
+}
+

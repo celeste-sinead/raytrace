@@ -25,6 +25,7 @@
 #include <iputil/trace.h>
 #include <iputil/unit.h>
 
+#include "lighting.h"
 #include "ray.h"
 #include "rayObject.h"
 #include "world.h"
@@ -90,7 +91,22 @@ RayVector BaseSphere::normal(const Coord &point) {
 
 //! Colour a ray
 bool Sphere::colour(Ray* inbound, World* world) {
+    // Diffuse light:
     RayColour colour = m_reflectivity * world->m_globalDiffuse;
+
+    /* Add contributions of all light sources */
+    RayVector intersect = inbound->m_endpoint + 
+        inbound->m_dir * inbound->m_intersectDist;;
+    RayVector interNorm = -normal(intersect);
+    for(unsigned i=0; i<world->lights().size(); ++i) {
+        Lighting cur = world->lights().at(i)->lightingAt(&intersect, world);
+
+        double scale = cur.m_dir.dot(interNorm);
+        if(scale<0.0) scale = 0.0;
+        
+        colour = colour + (m_reflectivity * cur.m_intensity * scale);
+    }
+
     inbound->m_colour = colour;
     return true;
 }

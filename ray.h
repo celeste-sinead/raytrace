@@ -70,6 +70,11 @@ public:
         m_depth(0), 
 	m_depthLimit(depthLimit)
         {}
+
+    /** Moves the endpoint of the ray a little bit along the ray.
+     *  This is used to prevent double-detections for reflections, etc.
+     *  @param distance  The distance to move the origin. */
+    void nudge(double distance=1E-5);
 	
     /** Create a parent for this Ray, if possible.  
      *  @return The new parent.  0 if creation fails (ie. we've reached the

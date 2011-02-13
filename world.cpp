@@ -66,7 +66,7 @@ bool World::trace(Ray* ray)
         double curDist = at(i)->intersectDist(ray);
         TRACE(TRC_DTL, "Object %d distance: %f\n", i, curDist);
 
-        if(curDist>=0.0) { // Actually intersects
+        if(curDist >= 0.0) { // Actually intersects
             if( (!closest) || (curDist < closestDist) ) {
                 // First intersection, or smallest intersection yet
                 closest = at(i);
@@ -93,3 +93,25 @@ bool World::trace(Ray* ray)
     TRACE(TRC_WARN,"Failed to trace ray.\n");
     return false;   
 }
+
+//! Find the first object intersecting a ray
+RayObject * World::intersect(Ray * ray)
+{
+    RayObject * closest = 0;
+    double closestDist = -1.0;
+
+    /* Look for objects for intersections */
+    for(int i=0; i<size(); ++i) {
+        double curDist = at(i)->intersectDist(ray);
+        if(curDist >= 0.0) {
+            if( (!closest) || (curDist < closestDist) ) {
+                closest = at(i);
+                closestDist = curDist;
+            }
+        }
+    }
+
+    ray->m_intersectDist = closestDist;
+    return closest;
+}
+

@@ -47,6 +47,14 @@ RayColour operator*(double left, const RayColour & other)
 {
     return RayColour(left*other.r, left*other.g, left*other.b);
 }
+RayColour RayColour::operator+(const RayColour& other)
+{
+    return RayColour(r+other.r, g+other.g, b+other.b);
+}
+RayColour RayColour::operator-(const RayColour& other)
+{
+    return RayColour(r-other.r, g-other.g, b-other.b);
+}
 double& RayColour::operator[](int inx) {
     switch(inx) {
         case 0: return r;
@@ -81,6 +89,7 @@ LinearColourAdapter::LinearColourAdapter(RayImage *image)
         return;
     }
 
+    /* Find the image max and min */
     m_min = image->at(0,0).m_colour[0];
     m_max = image->at(0,0).m_colour[0];
     for(int i=0; i<image->width(); ++i) {
@@ -93,7 +102,6 @@ LinearColourAdapter::LinearColourAdapter(RayImage *image)
             }
         }
     }
-
 }
 
 //! Straightforward linear colour conversion
