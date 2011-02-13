@@ -38,6 +38,7 @@
 #ifndef ray_h_
 #define ray_h_
 
+#include <vector>
 #include "geom.h"
 #include "colour.h"
 
@@ -52,9 +53,9 @@ class RayObject;
  *  object */
 class Ray {
 private:
-    /** Used to track and limit the number of parents spawned by this child*/
-    int         m_depth;
-    int         m_depthLimit;
+    // Current ray hierarchy depth.
+    int m_depth;
+    std::vector<Ray*> m_children;
 
 public:  
     //! A unit vector with the direction of this Ray
@@ -65,11 +66,13 @@ public:
     double      m_intersectDist;
     //! The colour of this ray
     RayColour   m_colour;
+    //! Maximum number of rays to create
+    int         m_depthLimit;
     
     Ray(int depthLimit=0) : 
-        m_depth(0), 
-	m_depthLimit(depthLimit)
+        m_depth(0), m_depthLimit(depthLimit)
         {}
+    virtual ~Ray();
 
     /** Moves the endpoint of the ray a little bit along the ray.
      *  This is used to prevent double-detections for reflections, etc.

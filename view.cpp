@@ -45,7 +45,7 @@ static trc_ctl_t viewTrace = {
     trc_printf(&viewTrace,level,1,args)
 
 //! Render the given image using the given object list
-void ParallelView::render(RayImage* image, World *world)
+void ParallelView::render(RayImage* image, World *world, int depth)
 {
     char trcbuf[36];  // for trace messages
     
@@ -75,11 +75,15 @@ void ParallelView::render(RayImage* image, World *world)
                 pixStepY/2.0 
                 + pixStepY*j;
             
-        rImage.at(i,j).m_dir = viewDir;
-        rImage.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
+            rImage.at(i,j).m_dir = viewDir;
+            rImage.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
+            rImage.at(i,j).m_depthLimit = depth;
+
             TRACE(TRC_INFO,"Pixel endpoint: %s\n",
                   rImage.at(i,j).m_endpoint.snprint(trcbuf,36));
+
             world->trace(&rImage.at(i,j));
+
             TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
                   i,j,rImage[i][j].m_colour.snprint(trcbuf,32));
         }

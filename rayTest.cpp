@@ -83,39 +83,52 @@ void singleSphere() {
 }
 
 void qtTest(QApplication &app) {
-    const int w = 650;
-    const int h = 650;
+    const int w = 1500;
+    const int h = 1000;
 
     World world;
-    world.m_defaultColour.set(1.0,0,0);  // bright red
-    world.m_globalDiffuse.set(0.05, 0.05, 0.15); // dark blue 
+    world.m_defaultColour.set(0,1.0,0);  
+    world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
     
-    Sphere sph ( Coord(0,0,0), 1.0, RayColour(0.0, 0.6, 1.0) );
+    Sphere sph ( Coord(0,0,0), 1.0, 
+                 RayColour(0.0, 0.6, 1.0),
+                 RayColour(0,0.3,0.5) );
     world.addObject(&sph);
 
-    Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, RayColour(0.8, 0.0, 0.4) );
+    Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, 
+                  RayColour(0.8, 0.0, 0.4),
+                  RayColour(0.8, 0.0, 0.4) );
     world.addObject(&sph2);
 
-    Sphere sph3 ( Coord(0,-1, 0), 0.5, RayColour(0.0, 0.8, 0.0) );
+    Sphere sph3 ( Coord(0,-1.25, 0), 0.5, 
+                  RayColour(0.0, 0.8, 0.0), 
+                  RayColour(0.0, 0.8, 0.0) );
     world.addObject(&sph3);
 
-    Sphere sph4( Coord(1,0.5,0.5), 0.75, RayColour(1.0, 0.0, 0.0) );
+    Sphere sph4( Coord(1.2,0.4,0.1), 0.75, 
+                 RayColour(1.0, 0.0, 0.0), 
+                 RayColour(1.0, 0.0, 0.0) );
     world.addObject(&sph4);
 
-    PointSource light1 ( RayColour(50.0,50.0,50.0), RayVector(1.5,-1.5,1.5) );
+    Sphere sph5( Coord(-3.5,-2, 2), 3,
+                 RayColour(0, 0, 0.4),
+                 RayColour(1, 1, 1) );
+    world.addObject(&sph5);
+
+    PointSource light1 ( RayColour(70.0,70.0,70.0), RayVector(1.5,-1.5,1.5) );
     world.addLight(&light1);
 
-    PointSource light2 ( RayColour(100,100,100), RayVector(5,-1,-1) );
+    PointSource light2 ( RayColour(150,150,150), RayVector(5,-1,-1) );
     world.addLight(&light2);
     
     ParallelView view;
-    view.m_origin = Coord(2.0,-1.5,1.5);
-    view.m_xVec = RayVector(0,3,0);
+    view.m_origin = Coord(2.0,-2,2);
+    view.m_xVec = RayVector(0,4.5,0);
     view.m_yVec = RayVector(0,0,-3);
     
     RayImage image (w, h);
 
-    view.render(&image, &world);
+    view.render(&image, &world, 20);
 
     DisplayImageQt *depthImage = new DisplayImageQt(w, h, Qt::blue);
     DepthAdapter depth (2.0);
@@ -126,7 +139,7 @@ void qtTest(QApplication &app) {
     visImage->fromRay(&image, &colour);
 
     QHBoxLayout *imgs = new QHBoxLayout();
-    imgs->addWidget(depthImage);
+    //imgs->addWidget(depthImage);
     imgs->addWidget(visImage);
 
     QWidget *topWidget = new QWidget();

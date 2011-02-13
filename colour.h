@@ -53,6 +53,9 @@ public:
     
     void set(double r, double g, double b);
 
+	//! Length of this colour (intepreted as a 3-vector)
+	double magnitude();
+
     //! Elementwise multiplication:
     RayColour operator*(const RayColour& other);
     //! Scaling:
@@ -63,7 +66,6 @@ public:
     RayColour operator-(const RayColour& other);
     //! Access colours r, g, b (convenient for iteration)
     double& operator[](int inx);
-
     
     //! Print this colour to a string, with maximum length.  Return the string.
     char* snprint(char* buf, int maxLen) const;

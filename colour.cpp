@@ -22,6 +22,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 #include "colour.h"
 #include "ray.h"
@@ -33,6 +34,12 @@ void RayColour::set(double r, double g, double b)
     this->r = r;
     this->g = g;
     this->b = b;
+}
+
+//! Magnitude of this colour
+double RayColour::magnitude()
+{
+    return sqrt(r*r + g*g + b*b);
 }
 
 RayColour RayColour::operator*(const RayColour& other)

@@ -22,15 +22,23 @@
 
 #include "ray.h"
 
+Ray::~Ray()
+{
+    for(unsigned i=0; i<m_children.size(); ++i) 
+        delete m_children[i];
+}
+
 //! Allocate a new Ray, if we haven't reached limit of the hierarchy
 Ray* Ray::createParent()
 {
-    // Negative limit is no limit at all
-    if( m_depthLimit < 0 ) return new Ray(m_depthLimit);
     if( m_depth >= m_depthLimit ) return 0;
+
     Ray * newParent = new Ray(m_depthLimit);
     if( !newParent ) return 0;
+
     newParent->m_depth = m_depth + 1;
+
+    m_children.push_back(newParent);
     return newParent;
 }
 

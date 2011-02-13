@@ -107,6 +107,20 @@ bool Sphere::colour(Ray* inbound, World* world) {
         colour = colour + (m_diffusivity * cur.m_intensity * scale);
     }
 
+    /* Attempt to trace a reflection */
+    Ray * reflect = inbound->createParent();
+    if(reflect && (m_reflectivity.magnitude() != 0) ) {
+        reflect->m_endpoint = intersect;
+        RayVector incNormal (interNorm.dot(inbound->m_dir) * interNorm);
+        RayVector incTangent ( (inbound->m_dir) - incNormal );
+        reflect->m_dir = incTangent - incNormal;
+        reflect->nudge();
+        
+        if(world->trace(reflect)) {
+            colour = colour + (m_reflectivity * reflect->m_colour);
+        }
+    }
+
     inbound->m_colour = colour;
     return true;
 }
