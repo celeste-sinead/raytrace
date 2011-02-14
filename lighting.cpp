@@ -39,19 +39,36 @@ Lighting PointSource::lightingAt(Coord * point, World *world )
     RayObject * obj = world->intersect(&lightRay);
 
     Lighting result;
-    if( obj && (lightRay.m_intersectDist < toHere.length() ) ) {
-        // If an intersection was found and is closer than this light...
-        result.m_dir.set(1,0,0);
-        result.m_intensity.set(0,0,0);
-    } else {
-        result.m_dir = -lightRay.m_dir;
-        
-        /* Now, calculate the decrease in intensity due to distance
-         * (Calculation comes from surface area of a sphere) */
-        double scale = 1.0 / (4.0*M_PI*toHere.length()*toHere.length()); 
+    result.m_dir.set(1,0,0); // want nonzero vector incase somebody tries to math it
+    result.m_intensity.set(0,0,0);
 
-        result.m_intensity = m_intensity*scale;
-    }
+    // If an intersection was found and is closer than this light...
+    if( obj && (lightRay.m_intersectDist < toHere.length() ) ) {
+        if( dynamic_cast<RayObject*>(this) != obj ) {
+            /* Some entities will be both lights and objects, and will want to 
+             * inherit this functionality.  This check is in place to make sure
+             * that a point/light object does not obscure itself.  dynamic_cast
+             * retrieves the correct pointer for comparison for multiply
+             * inherited class, and zero if this is not an object.  */
+            return result;
+        }
+    } 
+
+    /* Now, calculate the decrease in intensity due to distance
+     * (Calculation comes from surface area of a sphere) */
+    double scale = 1.0 / (4.0*M_PI*toHere.length()*toHere.length()); 
+    result.m_intensity = m_intensity*scale;
+    result.m_dir = -lightRay.m_dir;
+
     return result;
+}
+
+bool SphereSource::colour(Ray* inbound, World* world)
+{
+    /* Calculate decrease in intensity due to distance, as above */
+    double dist = inbound->m_intersectDist;
+    double scale = 1.0 / (4.0*M_PI*dist*dist);
+    inbound->m_colour = scale * m_intensity;
+    return true;
 }
 

@@ -25,7 +25,9 @@
 
 #include "geom.h"
 #include "colour.h"
+#include "rayObject.h"
 
+class Ray;
 class World;
 
 /** Expresses a particular lighting condition.  Lighting
@@ -57,16 +59,29 @@ public:
 
 /** A simple point source of light. */
 class PointSource : public LightSource{
-private:
+protected:
     RayColour m_intensity;
     RayVector m_origin;
 
 public:
-    PointSource(const RayColour &intensity, const RayVector &origin):
+    PointSource(const RayVector &origin, const RayColour &intensity):
         m_intensity(intensity), m_origin(origin)
         {}
 
     virtual Lighting lightingAt(Coord* point, World* world);
+};
+
+/** A visible, spherical light source.  Acts as a point source, but
+ *  is also visible for direct ray intersection */
+class SphereSource : public PointSource, public BaseSphere {
+public:
+    SphereSource(const RayVector &origin, double radius, const RayColour &intensity):
+        PointSource(origin,intensity),
+        BaseSphere(origin,radius)
+        {}
+
+//    virtual Lighting lightingAt(Coord* point, World* world);
+    virtual bool colour(Ray* inbound, World* world);
 };
 
 #endif // LIGHTING_H_

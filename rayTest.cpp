@@ -83,30 +83,30 @@ void singleSphere() {
 }
 
 void qtTest(QApplication &app) {
-    const int w = 1500;
-    const int h = 1000;
+    const int w = 750;
+    const int h = 500;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
     
     Sphere sph ( Coord(0,0,0), 1.0, 
-                 RayColour(0.0, 0.6, 1.0),
-                 RayColour(0,0.3,0.5) );
+                 RayColour(0.0, 0.15, 0.25),
+                 RayColour(0,0.6,1.0) );
     world.addObject(&sph);
 
     Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, 
-                  RayColour(0.8, 0.0, 0.4),
-                  RayColour(0.8, 0.0, 0.4) );
+                  RayColour(0.4, 0.0, 0.1),
+                  RayColour(1.0, 0.0, 0.5) );
     world.addObject(&sph2);
 
     Sphere sph3 ( Coord(0,-1.25, 0), 0.5, 
-                  RayColour(0.0, 0.8, 0.0), 
-                  RayColour(0.0, 0.8, 0.0) );
+                  RayColour(0.0, 0.2, 0.0), 
+                  RayColour(0.0, 1.0, 0.0) );
     world.addObject(&sph3);
 
-    Sphere sph4( Coord(1.2,0.4,0.1), 0.75, 
-                 RayColour(1.0, 0.0, 0.0), 
+    Sphere sph4( Coord(1.2,0.3,0.1), 0.75, 
+                 RayColour(0.2, 0.0, 0.0), 
                  RayColour(1.0, 0.0, 0.0) );
     world.addObject(&sph4);
 
@@ -115,11 +115,13 @@ void qtTest(QApplication &app) {
                  RayColour(1, 1, 1) );
     world.addObject(&sph5);
 
-    PointSource light1 ( RayColour(70.0,70.0,70.0), RayVector(1.5,-1.5,1.5) );
+    SphereSource light1 (RayVector(1.5,-2.5,1.5), 0.125, RayColour(70.0,70.0,70.0));
     world.addLight(&light1);
+    world.addObject(&light1);
 
-    PointSource light2 ( RayColour(150,150,150), RayVector(5,-1,-1) );
+    SphereSource light2 (RayVector(5,-1,-1), 0.125, RayColour(150,150,150));
     world.addLight(&light2);
+    world.addObject(&light2);
     
     ParallelView view;
     view.m_origin = Coord(2.0,-2,2);
@@ -135,7 +137,7 @@ void qtTest(QApplication &app) {
     depthImage->fromRay(&image, &depth);
 
     DisplayImageQt *visImage = new DisplayImageQt(w, h, Qt::blue);
-    LinearColourAdapter colour (&image);
+    LinearColourAdapter colour (0,1.0);
     visImage->fromRay(&image, &colour);
 
     QHBoxLayout *imgs = new QHBoxLayout();

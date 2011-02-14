@@ -39,7 +39,7 @@ static trc_ctl_t rayObjectTrc = {
     trc_printf(&rayObjectTrc,(level),1,args)
 
 //! Checks if a ray intersects this object.  
-double BaseSphere::sphereIntersectDist(Ray *inbound)
+double BaseSphere::intersectDist(Ray *inbound)
 {
     /* Find the intersections between the inbound unit vector and
      * this sphere. You will need a whiteboard to verify.*/

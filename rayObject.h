@@ -70,7 +70,6 @@ protected:
 
 protected:
     RayVector normal(const Coord &point);
-    double sphereIntersectDist(Ray* ray);
 
 public:
     BaseSphere(const Coord& origin, double radius) : 
@@ -79,6 +78,8 @@ public:
 
     void setOrigin(const Coord& newOrig) { m_origin = newOrig; }
     void setRadius(double newRad) { m_radius = newRad; }
+
+    virtual double intersectDist(Ray* inbound);
 };
 
 /** A solid sphere */
@@ -100,8 +101,6 @@ public:
         m_reflectivity(reflectivity)
         {}
 
-    virtual double intersectDist(Ray* inbound)
-        { return sphereIntersectDist(inbound); }
     virtual bool colour(Ray* inbound, World* world);
 };
 
