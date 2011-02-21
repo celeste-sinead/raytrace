@@ -66,14 +66,14 @@ void ParallelView::render(RayImage* image, World *world, int depth)
     // to the next
     double pixStepX = 1.0/rImage.width();
     double pixStepY = 1.0/rImage.height();
-    for(int i=0; i<rImage.width(); i+=1) {
-        for(int j=0; j<rImage.height(); j+=1) {
+    for(int i=0; i<rImage.height(); i+=1) {
+        for(int j=0; j<rImage.width(); j+=1) {
             double xDist =
                 pixStepX/2.0 // middle of pixel
-                + pixStepX*i; // which pixel
+                + pixStepX*j; // which pixel
             double yDist = 
                 pixStepY/2.0 
-                + pixStepY*j;
+                + pixStepY*i;
             
             rImage.at(i,j).m_dir = viewDir;
             rImage.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
@@ -89,3 +89,9 @@ void ParallelView::render(RayImage* image, World *world, int depth)
         }
     }
 }
+
+void AngleView::render(RayImage *image, World *object, int depth)
+{
+    #warning todo: implement
+}
+

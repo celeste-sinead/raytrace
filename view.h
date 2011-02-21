@@ -58,4 +58,17 @@ public:
     virtual void render(RayImage *image, World *world, int depth=0);
 };
 
+/** A view projected from a single point, with rays diverging over a given
+ *  field of view */
+class AngleView: public RayView {
+public:
+    Coord     m_origin;
+    RayVector m_xvec;
+    double    m_xFov;
+    RayVector m_yvec;
+    double    m_yFov;
+
+    virtual void render(RayImage *image, World *world, int depth=0);
+};
+
 #endif //view_h_

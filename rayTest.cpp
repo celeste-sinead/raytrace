@@ -72,42 +72,42 @@ void singleSphere() {
     view.m_xVec = RayVector(0,3,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage image (w, h);
+    RayImage image (h, w);
     
     view.render(&image, &world);
     
-    AsciiImage ascii(w, h);
+    AsciiImage ascii(h, w);
     ascii.fromRay(&image,0,0.5);
     ascii.print();
 
 }
 
 void qtTest(QApplication &app) {
-    const int w = 750;
-    const int h = 500;
+    const int w = 600;
+    const int h = 400;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
     
     Sphere sph ( Coord(0,0,0), 1.0, 
-                 RayColour(0.0, 0.15, 0.25),
-                 RayColour(0,0.6,1.0) );
+                 RayColour(0.1, 0.25, 1.0),
+                 RayColour(0.1,0.25,1.0) );
     world.addObject(&sph);
 
     Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, 
-                  RayColour(0.4, 0.0, 0.1),
-                  RayColour(1.0, 0.0, 0.5) );
+                  RayColour(1.0, 1.0, 0.1),
+                  RayColour(1.0, 1.0, 0.2) );
     world.addObject(&sph2);
 
     Sphere sph3 ( Coord(0,-1.25, 0), 0.5, 
-                  RayColour(0.0, 0.2, 0.0), 
-                  RayColour(0.0, 1.0, 0.0) );
+                  RayColour(0.1, 1.0, 0.1), 
+                  RayColour(0.2, 1.0, 0.2) );
     world.addObject(&sph3);
 
     Sphere sph4( Coord(1.2,0.3,0.1), 0.75, 
-                 RayColour(0.2, 0.0, 0.0), 
-                 RayColour(1.0, 0.0, 0.0) );
+                 RayColour(1.0, 0.1, 0.1), 
+                 RayColour(1.0, 0.2, 0.2) );
     world.addObject(&sph4);
 
     Sphere sph5( Coord(-3.5,-2, 2), 3,
@@ -115,11 +115,11 @@ void qtTest(QApplication &app) {
                  RayColour(1, 1, 1) );
     world.addObject(&sph5);
 
-    SphereSource light1 (RayVector(1.5,-2.5,1.5), 0.125, RayColour(70.0,70.0,70.0));
+    SphereSource light1 (RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0));
     world.addLight(&light1);
     world.addObject(&light1);
 
-    SphereSource light2 (RayVector(5,-1,-1), 0.125, RayColour(150,150,150));
+    SphereSource light2 (RayVector(5,-1,-1), 0.125, RayColour(100,100,100));
     world.addLight(&light2);
     world.addObject(&light2);
     
@@ -128,20 +128,16 @@ void qtTest(QApplication &app) {
     view.m_xVec = RayVector(0,4.5,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage image (w, h);
+    RayImage image (h, w);
 
     view.render(&image, &world, 20);
 
-    DisplayImageQt *depthImage = new DisplayImageQt(w, h, Qt::blue);
-    DepthAdapter depth (2.0);
-    depthImage->fromRay(&image, &depth);
-
-    DisplayImageQt *visImage = new DisplayImageQt(w, h, Qt::blue);
-    LinearColourAdapter colour (0,1.0);
-    visImage->fromRay(&image, &colour);
+    RayColourImage      rcimg(image);
+    LinearColourAdapter colour(0.0,1.0);
+    DisplayImage        dimg(rcimg, colour);
+    DisplayImageQt *visImage = new DisplayImageQt(dimg);
 
     QHBoxLayout *imgs = new QHBoxLayout();
-    //imgs->addWidget(depthImage);
     imgs->addWidget(visImage);
 
     QWidget *topWidget = new QWidget();
@@ -150,3 +146,4 @@ void qtTest(QApplication &app) {
 
     app.exec();
 }
+

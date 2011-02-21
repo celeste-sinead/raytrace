@@ -42,6 +42,16 @@ double RayColour::magnitude()
     return sqrt(r*r + g*g + b*b);
 }
 
+RayColour& RayColour::operator=(const RayColour& other)
+{
+    set(other.r, other.g, other.b);
+    return *this;
+}
+RayColour& RayColour::operator=(double other)
+{
+    set(other, other, other);
+    return *this;
+}
 RayColour RayColour::operator*(const RayColour& other)
 {
     return RayColour(r*other.r, g*other.g, b*other.b);
@@ -71,20 +81,52 @@ double& RayColour::operator[](int inx) {
     };
 }
 
+DisplayColour& DisplayColour::operator=(const DisplayColour& other)
+{
+    set(other.r, other.g, other.b);
+    return *this;
+}
+DisplayColour& DisplayColour::operator=(double other)
+{
+    set(other, other, other);
+    return *this;
+}
+DisplayColour DisplayColour::operator*(const DisplayColour& other)
+{
+    return DisplayColour(r*other.r, g*other.g, b*other.b);
+}
+DisplayColour DisplayColour::operator*(double other)
+{
+    return DisplayColour(r*other, g*other, b*other);
+}
+DisplayColour operator*(double left, const DisplayColour & other)
+{
+    return DisplayColour(left*other.r, left*other.g, left*other.b);
+}
+DisplayColour DisplayColour::operator+(const DisplayColour& other)
+{
+    return DisplayColour(r+other.r, g+other.g, b+other.b);
+}
+DisplayColour DisplayColour::operator-(const DisplayColour& other)
+{
+    return DisplayColour(r-other.r, g-other.g, b-other.b);
+}
+double& DisplayColour::operator[](int inx) {
+    switch(inx) {
+        case 0: return r;
+        case 1: return g;
+        case 2: return b;
+        default: abort();
+    };
+}
+
+
 //! Print this colour to a string
 char* RayColour::snprint(char *buf, int maxLen) const
 {
     snprintf(buf,maxLen,"R:%.03f G:%.03f B:%.03f",r,g,b);
     buf[maxLen-1] = '\0';
     return buf;
-}
-
-//! Set all components of the colour
-void DisplayColour::set(double r, double g, double b)
-{
-    this->r = r;
-    this->g = g;
-    this->b = b;
 }
 
 //! Find max and min in image, for conversion range
@@ -112,28 +154,13 @@ LinearColourAdapter::LinearColourAdapter(RayImage *image)
 }
 
 //! Straightforward linear colour conversion
-void LinearColourAdapter::convert(Ray* source, DisplayColour* dest)
+void LinearColourAdapter::convert(RayColour* source, DisplayColour* dest)
 {
-    dest->r = (source->m_colour.r-m_min) / (m_max-m_min);
+    dest->r = (source->r-m_min) / (m_max-m_min);
     if( dest->r > 1.0 ) dest->r = 1.0;
-    dest->g = (source->m_colour.g-m_min) / (m_max-m_min);
+    dest->g = (source->g-m_min) / (m_max-m_min);
     if( dest->g > 1.0 ) dest->g = 1.0;
-    dest->b = (source->m_colour.b-m_min) / (m_max-m_min);
+    dest->b = (source->b-m_min) / (m_max-m_min);
     if( dest->b > 1.0 ) dest->b = 1.0;
-}
-
-//! Depth mapping
-void DepthAdapter::convert(Ray *source, DisplayColour *dest)
-{
-    // Rays which intersect nothing are treated as maximally distant
-    if( source->m_intersectDist < 0 ) {
-        dest->set(0, 0, 0);
-        return;
-    }
-
-    double distScale = source->m_intersectDist / m_maxDepth;
-    if(distScale>1.0) distScale = 1.0;
-    // Reverse the scale, so near objects are bright and distant dark
-    dest->set(1.0-distScale, 1.0-distScale, 1.0-distScale);
 }
 

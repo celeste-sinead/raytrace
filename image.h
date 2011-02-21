@@ -25,6 +25,7 @@
 #define image_h_
 
 #include <cstdio>
+#include <vector>
 #include <QColor>
 #include <QImage>
 #include <QObject>
@@ -37,8 +38,10 @@ class DisplayColour;
 class ColourAdapter;
 class QPaintEvent;
 
-/** Image base template, which provides data storage functionality
- *  to image classes 
+/*  Image data storage template, which provides functionality for
+ *  storage of an image whose elements have (nearly) arbitrary type. 
+ *  This should be the base of all image classes.
+ *  Template type must define the assignment operator.
  *  As per convention in images, pixels are indexed such that 
  *  (0,0) is the top left pixel, x indices increase right, and y
  *  indices increase down */
@@ -50,47 +53,94 @@ protected:
     PixT   **m_pixels;
     
 public:
-    ImageData( int width = 0, int height = 0, PixT* fillColour = 0 );
+    ImageData(int height = 0, int width = 0, PixT* fillColour = 0 );
+    ImageData(const ImageData<PixT> & other);
     virtual ~ImageData();
  
     /** Image size access */
-    int width() 
-        { return m_width; }
     int height() 
         { return m_height; }
+    int width() 
+        { return m_width; }
     /** Resize image.  Existing data is truncated, or padded, depending
      *  on size change.  If allocation fails, size will be set to 0x0 */
-    void setSize(int width, int height, PixT *fillColour=0);
+    void setSize(int height, int width, PixT *fillColour=0);
    
     /** Fill the image with a particular colour */
     void fill(PixT &fillColour);
    
-    /** Access pixels */
-    PixT& at(int xInx, int yInx)
-        { return m_pixels[xInx][yInx]; }
-    PixT *operator[](int xInx)
-        { return m_pixels[xInx]; }
+    /** Access pixels. */
+    PixT& at(int yInx, int xInx)
+        { return m_pixels[yInx][xInx]; }
+    PixT *operator[](int yInx)
+        { return m_pixels[yInx]; }
 
 private:
     /** Frees memory used to store the image */
     void freePix();
 };
 
+/** Template for images which have pixels of numeric type.
+ *  This class provides basic image processing algorithms, and relies
+ *  on the following operators being defined for the template type:
+ *  - assignment, including assignment to '0'
+ *  - subtraction (between PixT) and unary negation
+ *  - multiplication and division (by PixT and by double) */
+template<typename PixT>
+class NumericImage : public ImageData<PixT> {
+public:
+    /** A filter kernel */
+    typedef ImageData<PixT> Kernel;
+
+public:
+    NumericImage(int height = 0, int width = 0, PixT* fillColor = 0) :
+        ImageData<PixT>(height, width, fillColor)
+        {}
+    NumericImage( const NumericImage<PixT> & other ) :
+        ImageData<PixT>(other)
+        {}
+
+    /** Apply a given filter kernel to this image.
+     *  @param filter  The kernel to apply.  Typically this will be square,
+     *                 with odd width and height, but this is not a strict
+     *                 requirement.  If width or height are even, then
+     *                 the extra elements are considered to be right of / above
+     *                 the kernel centre */
+    void filter(Kernel &kernel);
+
+    void resize(int newHeight, int newWidth);
+
+    /** Fetch a pixel, allowing indices to go outside of bounds, with a zero
+     *  slope boundary condition */
+    PixT & framedGet(int yInx, int xInx);
+};
+
 /** An image containing traced rays */
 class RayImage : public ImageData<Ray> {
 public:
-    RayImage( int width=0, int height=0, Ray* fillColour=0) :
-        ImageData<Ray>(width,height,fillColour)
+    RayImage(int height=0, int width=0, Ray* fillColour=0) :
+        ImageData<Ray>(height,width,fillColour)
         { }
+};
 
+/** An image containing HDR ray colours */
+class RayColourImage : public NumericImage<RayColour> {
+public:
+    RayColourImage(RayImage &ray);
+};
+
+/** An image composed of displayable colours */
+class DisplayImage : public NumericImage<DisplayColour> {
+public:
+    DisplayImage(RayColourImage &ray, ColourAdapter &adapter);
 };
 
 /** A binary image rendered in text (for testing). i.e colours below
  *  a threshold are rendered as 'X' and others are rendered as a space */
 class AsciiImage : public ImageData<char> {
 public:
-    AsciiImage( int width=0, int height=0, char *fill=0 ) :
-        ImageData<char>(width,height,fill)
+    AsciiImage(int height=0, int width=0, char *fill=0 ) :
+        ImageData<char>(height,width,fill)
         { }
      
     /** Convert from a RayImage. 
@@ -113,13 +163,10 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 public:
-    DisplayImageQt(int width=0, int height=0, const QColor &fill = Qt::black, QWidget *parent = 0);
-    virtual QSize sizeHint() const { return m_image.size(); }
+    DisplayImageQt(DisplayImage &img, QWidget *parent = 0);
 
-    /* Convert from a HDR RayImage
-     * @param ray     The RayImage to convert from
-     * @param adapter The colour converter to use */
-    void fromRay(RayImage * ray, ColourAdapter * adapter);
+    virtual QSize sizeHint() const 
+        { return m_image.size(); }
 };
 
 //! Include template function definitions

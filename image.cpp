@@ -29,13 +29,42 @@
 
 #include "image.h"
 #include "colour.h"
+#include "iputil/trace.h"
+
+static trc_ctl_t imgTrace = {
+    TRC_DFL_LVL,
+    "IMAGE",
+    TRC_STDOUT
+};
+#define TRACE(level, args...) \
+    trc_printf(&imgTrace,level,1,args)
+
+RayColourImage::RayColourImage(RayImage & ray) :
+    NumericImage<RayColour>(ray.height(), ray.width())
+{
+    for(int i=0; i<height(); ++i) {
+        for(int j=0; j<width(); ++j) {
+            at(i,j) = ray.at(i,j).m_colour;
+        }
+    }
+}
+
+DisplayImage::DisplayImage(RayColourImage &ray, ColourAdapter &adapter) :
+    NumericImage<DisplayColour>(ray.height(), ray.width())
+{
+    for(int i=0; i<height(); ++i) {
+        for(int j=0; j<width(); ++j) {
+            adapter.convert(&(ray.at(i,j)), &at(i,j));
+        }
+    }
+}
 
 //! Converts a RayImage to Ascii
 void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold)
 {
     double intensity;
-    for( int i=0; (i<ray->width()) && (i<width()); ++i ) {
-        for( int j=0; (j<ray->height()) && (j<height()); ++j ) {
+    for( int i=0; (i<ray->height()) && (i<height()); ++i ) {
+        for( int j=0; (j<ray->width()) && (j<width()); ++j ) {
             RayColour & curC = ray->at(i,j).m_colour;
             intensity = curC.b + curC.g + curC.r;
             intensity /= 3.0;
@@ -49,37 +78,35 @@ void AsciiImage::print(FILE* outFile)
 {
     for( int y=0; y<height(); ++y) {
         for( int x=0; x<width(); ++x ) {
-            fprintf(outFile,"%c",at(x,y)); 
+            fprintf(outFile,"%c",at(y,x)); 
         }
         fprintf(outFile,"\n");
     }
 }
 
-DisplayImageQt::DisplayImageQt(int width, int height, const QColor &fill, QWidget * parent) :
+DisplayImageQt::DisplayImageQt(DisplayImage &img, QWidget * parent) :
     QWidget(parent),
-    m_image(width, height, QImage::Format_ARGB32)
+    m_image(img.width(), img.height(), QImage::Format_ARGB32)
 { 
-    m_image.fill(fill.rgb());
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+    TRACE(TRC_INFO, "Created new DisplayImageQt, %dx%d\n", 
+        m_image.width(), m_image.height());
+    QColor curC;
+    for(int i=0; i<img.height(); ++i) {
+        for(int j=0; j<img.width(); ++j) {
+            curC = QColor(img.at(i,j).red(8),
+                           img.at(i,j).green(8),
+                           img.at(i,j).blue(8));
+            m_image.setPixel(j, i, curC.rgb());
+        }
+    }
 }
 
 void DisplayImageQt::paintEvent(QPaintEvent *event)
 {
+    TRACE(TRC_DTL, "Painted DisplayImageQt\n");
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), m_image);
-}
-
-void DisplayImageQt::fromRay(RayImage * ray, ColourAdapter * adapter)
-{
-    DisplayColour curC;
-    QColor qCurC;
-    for(int row=0; row < ray->height(); ++row) {
-        for(int col=0; col < ray->width(); ++col) {
-            adapter->convert(&(ray->at(col,row)), &curC);
-            qCurC = QColor(curC.red(8), curC.green(8), curC.blue(8));
-            m_image.setPixel(col, row, qCurC.rgb());
-        }
-    }
 }
 

@@ -56,11 +56,14 @@ public:
 	//! Length of this colour (intepreted as a 3-vector)
 	double magnitude();
 
+    //! Assignment
+    RayColour& operator=(const RayColour& other);
+    RayColour& operator=(double other);
     //! Elementwise multiplication:
     RayColour operator*(const RayColour& other);
     //! Scaling:
     RayColour operator*(double other);
-    friend RayColour operator*(double right, const RayColour& left);
+    friend RayColour operator*(double left, const RayColour& right);
     //! Elementwise addition/subtraction:
     RayColour operator+(const RayColour& other);
     RayColour operator-(const RayColour& other);
@@ -71,18 +74,14 @@ public:
     char* snprint(char* buf, int maxLen) const;
 };
 
-/** A color, for displaying.  Functions for transforming from internal ray colors
- *  to display colors are included.  (They're rather arbitrary!) */
-class DisplayColour {
+/** A displayable colour.  That is, a colour whose values are all constrained
+ *  to lie in the range [0,1].  The main difference between a RayColour and a
+ *  DisplayColour is logical (different allowable ranges) */
+class DisplayColour: public RayColour {
 public:
-    /** RGB intensity.  Kept in double precision, in the range [0,1.0], so we can
-     *  easily convert to arbitrary integer color depth */
-    double r;
-    double g;
-    double b;
-
-    /** Convenience to set all of the above */
-    void set(double r, double g, double b);
+    DisplayColour() : RayColour() {}
+    DisplayColour(double cr, double cg, double cb) : RayColour(cr, cg, cb) {}
+    DisplayColour(const DisplayColour &other) : RayColour(other) {}
 
     /** Convert to arbitrary integer color depth.  Depth is in bits */
     unsigned long red(unsigned int depth)
@@ -91,6 +90,20 @@ public:
         { return g*((1<<depth) - 1); }
     unsigned long blue(unsigned int depth)
         { return b*((1<<depth) - 1); }
+
+    //! Assignment
+    DisplayColour& operator=(const DisplayColour& other);
+    DisplayColour& operator=(double other);
+    //! Elementwise multiplication:
+    DisplayColour operator*(const DisplayColour& other);
+    //! Scaling:
+    DisplayColour operator*(double other);
+    friend DisplayColour operator*(double left, const DisplayColour& right);
+    //! Elementwise addition/subtraction:
+    DisplayColour operator+(const DisplayColour& other);
+    DisplayColour operator-(const DisplayColour& other);
+    //! Access colours r, g, b (convenient for iteration)
+    double& operator[](int inx);
 };
 
 /** Provides a strategy for converting between a high dynamic range RayColour
@@ -101,7 +114,7 @@ public:
      *  information) into a displayable colour 
      *  @param source The ray to colour
      *  @param dest   The DisplayColour instance to fill */
-    virtual void convert(Ray * source, DisplayColour * dest) = 0;  
+    virtual void convert(RayColour * source, DisplayColour * dest) = 0;  
 };
 
 /** Implements a simple linear scaling */
@@ -116,19 +129,7 @@ public:
         {}  
     LinearColourAdapter(RayImage *image);
 
-    virtual void convert(Ray * source, DisplayColour * dest);
-};
-
-/** Provides depth mapping */
-class DepthAdapter: public ColourAdapter {
-private:
-    //! Maximum depth (corresponds to black)
-    double m_maxDepth;
-
-public:
-    DepthAdapter(double maxDepth) : m_maxDepth(maxDepth) {}
-
-    virtual void convert(Ray * source, DisplayColour * dest);
+    virtual void convert(RayColour * source, DisplayColour * dest);
 };
 
 #endif
