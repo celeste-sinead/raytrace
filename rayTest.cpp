@@ -83,8 +83,8 @@ void singleSphere() {
 }
 
 void qtTest(QApplication &app) {
-    const int w = 600;
-    const int h = 400;
+    const int w = 1500;
+    const int h = 1000;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
