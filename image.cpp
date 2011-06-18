@@ -22,14 +22,14 @@
 *****************************************************************************/
 
 #include <cstdio>
-#include <iputil/unit.h>
 
 #include <QPaintEvent>
 #include <QPainter>
 
 #include "image.h"
 #include "colour.h"
-#include "iputil/trace.h"
+#include "trace.h"
+#include "unit.h"
 
 static trc_ctl_t imgTrace = {
     TRC_DFL_LVL,

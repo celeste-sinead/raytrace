@@ -22,12 +22,12 @@
  *****************************************************************************/
 
 #include <math.h>
-#include <iputil/trace.h>
-#include <iputil/unit.h>
 
 #include "lighting.h"
 #include "ray.h"
 #include "rayObject.h"
+#include "trace.h"
+#include "unit.h"
 #include "world.h"
 
 static trc_ctl_t rayObjectTrc = {

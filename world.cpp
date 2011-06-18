@@ -23,13 +23,13 @@
 
 #include <vector>
 #include <cmath>
-#include <iputil/trace.h>
 
 #include "world.h"
 
 #include "colour.h"
 #include "ray.h"
 #include "rayObject.h"
+#include "trace.h"
 
 using std::vector;
 

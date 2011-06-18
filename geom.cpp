@@ -22,10 +22,10 @@
 
 #include <cstdio>
 #include <cmath>
-#include <iputil/unit.h>
-#include <iputil/trace.h>
 
 #include "geom.h"
+#include "unit.h"
+#include "trace.h"
 
 static trc_ctl_t geomTrace = {
     TRC_DFL_LVL,
