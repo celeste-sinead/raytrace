@@ -24,8 +24,8 @@
 #include <cmath>
 
 #include "geom.h"
-#include "unit.h"
-#include "trace.h"
+#include "util/unit.h"
+#include "util/trace.h"
 
 static trc_ctl_t geomTrace = {
     TRC_DFL_LVL,

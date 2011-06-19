@@ -25,8 +25,7 @@
 #define world_h_
 
 #include <vector>
-
-#include "colour.h"
+#include "image/colour.h"
 
 class LightSource;
 class Ray;

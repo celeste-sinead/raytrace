@@ -26,10 +26,10 @@
 
 #include "world.h"
 
-#include "colour.h"
+#include "image/colour.h"
+#include "util/trace.h"
 #include "ray.h"
 #include "rayObject.h"
-#include "trace.h"
 
 using std::vector;
 

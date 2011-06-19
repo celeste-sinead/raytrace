@@ -27,11 +27,11 @@
 
 #include "view.h"
 
+#include "image/image.h"
+#include "util/trace.h"
 #include "geom.h"
-#include "image.h"
 #include "ray.h"
 #include "rayObject.h"
-#include "trace.h"
 #include "world.h"
 
 using std::vector;

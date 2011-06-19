@@ -21,16 +21,41 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 .DEFAULT_GOAL=all
+.SECONDEXPANSION:
 
 # List of subdir from which to obtain source lists
-SUBDIRS:=trace\
-		 image
+SUBDIRS:=image\
+		 trace\
+		 util
+
+# Compile config
+CXX= g++
+CXXFLAGS= -Wall -g -O0
+INCLUDES= -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4
 
 # Include all the subdirs
 include $(patsubst %,%/Makefile,$(SUBDIRS))
 
-all: debugp
+OBJDIR:=obj
+
+# All output dirs, which may need to be created, in the order
+# they need to be created.
+OUTPUT_DIRS:=$(OBJDIR)\
+			 $(patsubst %,$(OBJDIR)/%,$(SUBDIRS))
+
+$(OUTPUT_DIRS): ; mkdir $@
+
+# Compilation of cpp objects
+CXX_OBJS:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(CXX_SRCS))
+$(CXX_OBJS): $$(patsubst $(OBJDIR)/%.o,%.cpp,$$@) $(OUTPUT_DIRS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
+
+all: $(OUTPUT_DIRS) $(CXX_OBJS)
+
+clean:
+	rm -rf $(OBJDIR)
 
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"
+	@echo "CXX_OBJS: $(CXX_OBJS)"
 

@@ -23,8 +23,9 @@
 #ifndef LIGHTING_H_
 #define LIGHTING_H_
 
+#include "image/colour.h"
+
 #include "geom.h"
-#include "colour.h"
 #include "rayObject.h"
 
 class Ray;

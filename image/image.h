@@ -31,8 +31,8 @@
 #include <QObject>
 #include <QWidget>
 
+#include "trace/ray.h"
 #include "colour.h"
-#include "ray.h"
 
 class DisplayColour;
 class ColourAdapter;

@@ -25,7 +25,8 @@
 #include <cmath>
 
 #include "colour.h"
-#include "ray.h"
+
+#include "trace/ray.h"
 #include "image.h"
 
 //! Set all components of the colour

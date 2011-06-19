@@ -27,9 +27,8 @@
 #define view_h_
 
 #include <vector>
-
+#include "image/colour.h"
 #include "geom.h"
-#include "colour.h"
 
 class RayObject;
 class RayImage;

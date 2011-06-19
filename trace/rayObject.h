@@ -29,8 +29,9 @@
 #ifndef ray_object_h_
 #define ray_object_h_
 
+#include "image/colour.h"
+
 #include "geom.h"
-#include "colour.h"
 
 class Ray;
 class World;

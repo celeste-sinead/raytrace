@@ -29,7 +29,6 @@ LOCAL_CXX_SRCS:= \
                  lighting.cpp \
                  ray.cpp \
                  rayObject.cpp \
-                 trace.cpp \
                  view.cpp \
                  world.cpp
 
