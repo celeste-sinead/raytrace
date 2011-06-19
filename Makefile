@@ -28,34 +28,67 @@ SUBDIRS:=image\
 		 trace\
 		 util
 
+# List of root-level cpp sources:
+CXX_SRCS:=$(CXX_SRCS) $(wildcard *.cpp)
+
 # Compile config
 CXX= g++
+MOC= moc-qt4
 CXXFLAGS= -Wall -g -O0
 INCLUDES= -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4
 
 # Include all the subdirs
 include $(patsubst %,%/Makefile,$(SUBDIRS))
 
-OBJDIR:=obj
+# Generated directories
+GENDIR:=gen
+
+# Deps need to be kept separately, because compilation of other
+# files will change dep dir access times, and deps must depend
+# explicitly on deps dir in order for implicit creation by
+# makefile to work.
+DEPDIR:=dep
 
 # All output dirs, which may need to be created, in the order
 # they need to be created.
-OUTPUT_DIRS:=$(OBJDIR)\
-			 $(patsubst %,$(OBJDIR)/%,$(SUBDIRS))
+DEP_DIRS:=$(DEPDIR) $(patsubst %,$(DEPDIR)/%,$(SUBDIRS))
+OUTPUT_DIRS:=$(GENDIR)\
+			 $(DEP_DIRS)\
+			 $(patsubst %,$(GENDIR)/%,$(SUBDIRS)) \
 
 $(OUTPUT_DIRS): ; mkdir $@
 
 # Compilation of cpp objects
-CXX_OBJS:=$(patsubst %.cpp,$(OBJDIR)/%.o,$(CXX_SRCS))
-$(CXX_OBJS): $$(patsubst $(OBJDIR)/%.o,%.cpp,$$@) $(OUTPUT_DIRS)
+CXX_OBJS:=$(patsubst %.cpp,$(GENDIR)/%.o,$(CXX_SRCS))
+$(CXX_OBJS): $$(patsubst $(GENDIR)/%.o,%.cpp,$$@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
 
-all: $(OUTPUT_DIRS) $(CXX_OBJS)
+# .cpp dependency generation
+CXX_DEPS:=$(patsubst %.cpp,$(DEPDIR)/%.d,$(CXX_SRCS))
+$(CXX_DEPS): $$(patsubst $(DEPDIR)/%.d,%.cpp,$$@) $(DEP_DIRS)
+	$(CXX) $(INCLUDES) -MM -MT $(<:%.cpp=$(DEPDIR)/%.o) -MF $@ $<
+depends: $(OUTPUT_DIR) $(CXX_DEPS)
+include $(CXX_DEPS)
+
+# QT MOC generation
+QT_MOC_SRCS:=$(patsubst %.h,$(GENDIR)/%.moc.cpp,$(QT_HEADS))
+$(QT_MOC_SRCS): $$(patsubst $(GENDIR)/%.moc.cpp,%.h,$$@)
+	$(MOC) $< -o $@
+
+QT_MOC_OBJS:=$(patsubst %.cpp,%.o,$(QT_MOC_SRCS))
+$(QT_MOC_OBJS): $$(patsubst %.o,%.cpp,$$@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
+
+all: $(OUTPUT_DIRS) $(CXX_OBJS) $(QT_MOC_OBJS)
 
 clean:
-	rm -rf $(OBJDIR)
+	rm -rf $(GENDIR)
+	rm -rf $(DEPDIR)
 
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"
 	@echo "CXX_OBJS: $(CXX_OBJS)"
+	@echo "QT_HEADS: $(QT_HEADS)"
+	@echo "QT_MOC_SRCS: $(QT_MOC_SRCS)"
+	@echo "QT_MOC_OBJS: $(QT_MOC_OBJS)"
 

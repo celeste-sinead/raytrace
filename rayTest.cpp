@@ -23,14 +23,14 @@
 #include <cstdio>
 #include <cstring>
 
-#include "colour.h"
-#include "image.h"
-#include "lighting.h"
-#include "ray.h"
-#include "rayObject.h"
-#include "unit.h"
-#include "view.h"
-#include "world.h"
+#include "image/colour.h"
+#include "image/image.h"
+#include "trace/lighting.h"
+#include "trace/ray.h"
+#include "trace/rayObject.h"
+#include "trace/view.h"
+#include "trace/world.h"
+#include "util/unit.h"
 
 #include <QtGui>
 

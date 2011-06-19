@@ -28,6 +28,11 @@ LOCAL_CXX_SRCS:= \
                  colour.cpp \
                  image.cpp
 
+# Local headers which declare Qt Objects
+LOCAL_QT_HEADS:= \
+                 image.h
+
 # Append this dir's srcs to the global source list
 CXX_SRCS:=$(CXX_SRCS) $(patsubst %,$(LOCAL_DIR)%,$(LOCAL_CXX_SRCS))
+QT_HEADS:=$(QT_HEADS) $(patsubst %,$(LOCAL_DIR)%,$(LOCAL_QT_HEADS))
 
