@@ -30,7 +30,9 @@ SRCDIRS:=image\
 		 util
 
 # List of root-level cpp sources:
-CXX_SRCS:=$(CXX_SRCS) $(wildcard *.cpp)
+CXX_SRCS:=$(CXX_SRCS)\
+		  test.cpp \
+		  trace-ui.cpp
 
 # Include all the subdirs
 include $(patsubst %,%/Makefile,$(SRCDIRS))
@@ -39,15 +41,22 @@ include $(patsubst %,%/Makefile,$(SRCDIRS))
 GENDIR:=gen
 
 # List of bins to link
-BINS:=test
+BINS:=test trace-ui
 
-test_OBJS:= \
+COMMON_OBJS:= \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(IMAGE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(TRACE_CXX_SRCS)) \
-	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) 
+
+test_OBJS:= \
+	$(COMMON_OBJS) \
+	gen/test.o
+
+trace-ui_OBJS:= \
+	$(COMMON_OBJS) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(UI_CXX_SRCS)) \
 	gen/ui/imageWidget.moc.o \
-	gen/rayTest.o
+	gen/trace-ui.o
 
 # Compile config
 CXX:= g++
