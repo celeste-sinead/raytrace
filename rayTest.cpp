@@ -30,6 +30,7 @@
 #include "trace/rayObject.h"
 #include "trace/view.h"
 #include "trace/world.h"
+#include "ui/imageWidget.h"
 #include "util/unit.h"
 
 #include <QtGui>
@@ -135,7 +136,7 @@ void qtTest(QApplication &app) {
     RayColourImage      rcimg(image);
     LinearColourAdapter colour(0.0,1.0);
     DisplayImage        dimg(rcimg, colour);
-    DisplayImageQt *visImage = new DisplayImageQt(dimg);
+    ImageWidget *visImage = new ImageWidget(&dimg);
 
     QHBoxLayout *imgs = new QHBoxLayout();
     imgs->addWidget(visImage);

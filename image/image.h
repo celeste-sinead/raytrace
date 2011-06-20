@@ -154,21 +154,6 @@ public:
     void print( FILE * outFile = stdout );
 };
 
-class DisplayImageQt : public QWidget { 
-Q_OBJECT
-private:
-    QImage m_image;
-
-protected:
-    void paintEvent(QPaintEvent *event);
-
-public:
-    DisplayImageQt(DisplayImage &img, QWidget *parent = 0);
-
-    virtual QSize sizeHint() const 
-        { return m_image.size(); }
-};
-
 //! Include template function definitions
 // inside_image_h_ is used to protect against inclusion elsewhere
 #define inside_image_h_

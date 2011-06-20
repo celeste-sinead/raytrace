@@ -26,6 +26,7 @@
 # List of subdir from which to obtain source lists
 SRCDIRS:=image\
 		 trace\
+		 ui \
 		 util
 
 # List of root-level cpp sources:
@@ -44,7 +45,8 @@ test_OBJS:= \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(IMAGE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(TRACE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) \
-	gen/image/image.moc.o \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(UI_CXX_SRCS)) \
+	gen/ui/imageWidget.moc.o \
 	gen/rayTest.o
 
 # Compile config
@@ -99,8 +101,8 @@ all: $(BINS) tags
 
 clean:
 	rm -rf $(GENDIR)
-	rm $(BINS)
-	rm tags
+	rm -f $(BINS)
+	rm -f tags
 
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"

@@ -84,29 +84,3 @@ void AsciiImage::print(FILE* outFile)
     }
 }
 
-DisplayImageQt::DisplayImageQt(DisplayImage &img, QWidget * parent) :
-    QWidget(parent),
-    m_image(img.width(), img.height(), QImage::Format_ARGB32)
-{ 
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    TRACE(TRC_INFO, "Created new DisplayImageQt, %dx%d\n", 
-        m_image.width(), m_image.height());
-    QColor curC;
-    for(int i=0; i<img.height(); ++i) {
-        for(int j=0; j<img.width(); ++j) {
-            curC = QColor(img.at(i,j).red(8),
-                           img.at(i,j).green(8),
-                           img.at(i,j).blue(8));
-            m_image.setPixel(j, i, curC.rgb());
-        }
-    }
-}
-
-void DisplayImageQt::paintEvent(QPaintEvent *event)
-{
-    TRACE(TRC_DTL, "Painted DisplayImageQt\n");
-    QPainter painter(this);
-    painter.drawImage(QPoint(0,0), m_image);
-}
-

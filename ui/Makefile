@@ -21,17 +21,21 @@
 # This gets the dir path that the including makefile used for this
 # makefile.  This same path should be used for this folders sources.
 # NB: immediate substitution is important, since MAKEFILE_LIST is volatile.
-IMAGE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
+UI_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Local source files that should be exported to build
-IMAGE_CXX_SRCS:= \
-                 colour.cpp \
-                 image.cpp
+UI_CXX_SRCS:= \
+			  imageWidget.cpp
 
-# Prepend the current directory name
-IMAGE_CXX_SRCS:= $(patsubst %,$(IMAGE_DIR)%,$(IMAGE_CXX_SRCS)) 
+# Local headers which declare Qt Objects
+UI_QT_HEADS:= \
+			  imageWidget.h
+
+# Prepend the directory name
+UI_CXX_SRCS:= $(patsubst %,$(UI_DIR)%,$(UI_CXX_SRCS))
+UI_QT_HEADS:= $(patsubst %,$(UI_DIR)%,$(UI_QT_HEADS))
 
 # Append this dir's srcs to the global source list
-CXX_SRCS:=$(CXX_SRCS) $(IMAGE_CXX_SRCS)
-QT_HEADS:=$(QT_HEADS) $(IMAGE_QT_HEADS)
+CXX_SRCS:=$(CXX_SRCS) $(UI_CXX_SRCS)
+QT_HEADS:=$(QT_HEADS) $(UI_QT_HEADS)
 
