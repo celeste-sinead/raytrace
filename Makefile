@@ -43,47 +43,43 @@ include $(patsubst %,%/Makefile,$(SUBDIRS))
 # Generated directories
 GENDIR:=gen
 
-# Deps need to be kept separately, because compilation of other
-# files will change dep dir access times, and deps must depend
-# explicitly on deps dir in order for implicit creation by
-# makefile to work.
-DEPDIR:=dep
-
-# All output dirs, which may need to be created, in the order
-# they need to be created.
-DEP_DIRS:=$(DEPDIR) $(patsubst %,$(DEPDIR)/%,$(SUBDIRS))
-OUTPUT_DIRS:=$(GENDIR)\
-			 $(DEP_DIRS)\
-			 $(patsubst %,$(GENDIR)/%,$(SUBDIRS)) \
-
-$(OUTPUT_DIRS): ; mkdir $@
-
 # Compilation of cpp objects
 CXX_OBJS:=$(patsubst %.cpp,$(GENDIR)/%.o,$(CXX_SRCS))
 $(CXX_OBJS): $$(patsubst $(GENDIR)/%.o,%.cpp,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
 
 # .cpp dependency generation
-CXX_DEPS:=$(patsubst %.cpp,$(DEPDIR)/%.d,$(CXX_SRCS))
-$(CXX_DEPS): $$(patsubst $(DEPDIR)/%.d,%.cpp,$$@) $(DEP_DIRS)
-	$(CXX) $(INCLUDES) -MM -MT $(<:%.cpp=$(DEPDIR)/%.o) -MF $@ $<
-depends: $(OUTPUT_DIR) $(CXX_DEPS)
+CXX_DEPS:=$(patsubst %.cpp,$(GENDIR)/%.d,$(CXX_SRCS))
+$(CXX_DEPS): $$(patsubst $(GENDIR)/%.d,%.cpp,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
+	$(CXX) $(INCLUDES) -MM -MT $(<:%.cpp=$(GENDIR)/%.o) -MF $@ $<
+deps: $(CXX_DEPS)
 include $(CXX_DEPS)
 
 # QT MOC generation
 QT_MOC_SRCS:=$(patsubst %.h,$(GENDIR)/%.moc.cpp,$(QT_HEADS))
 $(QT_MOC_SRCS): $$(patsubst $(GENDIR)/%.moc.cpp,%.h,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
 	$(MOC) $< -o $@
 
 QT_MOC_OBJS:=$(patsubst %.cpp,%.o,$(QT_MOC_SRCS))
 $(QT_MOC_OBJS): $$(patsubst %.o,%.cpp,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
 
-all: $(OUTPUT_DIRS) $(CXX_OBJS) $(QT_MOC_OBJS)
+# Deps for moc-generated cpps
+QT_MOC_DEPS:=$(patsubst $(GENDIR)/%.cpp,$(GENDIR)/%.d,$(QT_MOC_SRCS))
+$(QT_MOC_DEPS): $$(patsubst $(GENDIR)/%.d,$(GENDIR)/%.cpp,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
+	$(CXX) $(INCLUDES) -DQ_MOC_OUTPUT_REVISION=62 -MM -MT $(<:.cpp=.o) -MF $@ $<
+mocdeps: $(QT_MOC_DEPS)
+include $(QT_MOC_DEPS)
+
+all: $(CXX_OBJS) $(QT_MOC_OBJS)
 
 clean:
 	rm -rf $(GENDIR)
-	rm -rf $(DEPDIR)
 
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"
