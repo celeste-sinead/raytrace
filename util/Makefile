@@ -21,12 +21,15 @@
 # This gets the dir path that the including makefile used for this
 # makefile.  This same path should be used for this folders sources.
 # NB: immediate substitution is important, since MAKEFILE_LIST is volatile.
-LOCAL_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
+UTIL_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Local source files that should be exported to build
-LOCAL_CXX_SRCS:= \
+UTIL_CXX_SRCS:= \
                  trace.cpp
 
+# Prepend the directory name
+UTIL_CXX_SRCS:= $(patsubst %,$(UTIL_DIR)%,$(UTIL_CXX_SRCS))
+
 # Append this dir's srcs to the global source list
-CXX_SRCS:=$(CXX_SRCS) $(patsubst %,$(LOCAL_DIR)%,$(LOCAL_CXX_SRCS))
+CXX_SRCS:=$(CXX_SRCS) $(UTIL_CXX_SRCS)
 

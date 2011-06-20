@@ -24,24 +24,36 @@
 .SECONDEXPANSION:
 
 # List of subdir from which to obtain source lists
-SUBDIRS:=image\
+SRCDIRS:=image\
 		 trace\
 		 util
 
 # List of root-level cpp sources:
 CXX_SRCS:=$(CXX_SRCS) $(wildcard *.cpp)
 
-# Compile config
-CXX= g++
-MOC= moc-qt4
-CXXFLAGS= -Wall -g -O0
-INCLUDES= -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4
-
 # Include all the subdirs
-include $(patsubst %,%/Makefile,$(SUBDIRS))
+include $(patsubst %,%/Makefile,$(SRCDIRS))
 
 # Generated directories
 GENDIR:=gen
+
+# List of bins to link
+BINS:=test
+
+test_OBJS:= \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(IMAGE_CXX_SRCS)) \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(TRACE_CXX_SRCS)) \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) \
+	gen/image/image.moc.o \
+	gen/rayTest.o
+
+# Compile config
+CXX:= g++
+MOC:= moc-qt4
+CXXFLAGS:= -Wall -g -O0
+INCLUDES:= -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4
+LDFLAGS:= $(CXXFLAGS)
+LIBS:= -lm -lQtGui -lQtCore -lpthread
 
 # Compilation of cpp objects
 CXX_OBJS:=$(patsubst %.cpp,$(GENDIR)/%.o,$(CXX_SRCS))
@@ -76,10 +88,19 @@ $(QT_MOC_DEPS): $$(patsubst $(GENDIR)/%.d,$(GENDIR)/%.cpp,$$@)
 mocdeps: $(QT_MOC_DEPS)
 include $(QT_MOC_DEPS)
 
-all: $(CXX_OBJS) $(QT_MOC_OBJS)
+# Binary link rules
+$(BINS): $$($$@_OBJS)
+	$(CXX) $(LDFLAGS) $(LIBS) $^ -o $@
+
+tags: $(CXX_SRCS)
+	ctags $(CXX_SRCS)
+
+all: $(BINS) tags
 
 clean:
 	rm -rf $(GENDIR)
+	rm $(BINS)
+	rm tags
 
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"
