@@ -26,7 +26,8 @@ IMAGE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 # Local source files that should be exported to build
 IMAGE_CXX_SRCS:= \
                  colour.cpp \
-                 image.cpp
+                 image.cpp \
+                 rayImage.cpp
 
 # Prepend the current directory name
 IMAGE_CXX_SRCS:= $(patsubst %,$(IMAGE_DIR)%,$(IMAGE_CXX_SRCS)) 
