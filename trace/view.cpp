@@ -27,7 +27,7 @@
 
 #include "view.h"
 
-#include "image/image.h"
+#include "image/rayImage.h"
 #include "util/trace.h"
 #include "geom.h"
 #include "ray.h"
@@ -66,8 +66,8 @@ void ParallelView::render(RayImage* image, World *world, int depth)
     // to the next
     double pixStepX = 1.0/rImage.width();
     double pixStepY = 1.0/rImage.height();
-    for(int i=0; i<rImage.height(); i+=1) {
-        for(int j=0; j<rImage.width(); j+=1) {
+    for(unsigned i=0; i<rImage.height(); i+=1) {
+        for(unsigned j=0; j<rImage.width(); j+=1) {
             double xDist =
                 pixStepX/2.0 // middle of pixel
                 + pixStepX*j; // which pixel
@@ -85,7 +85,7 @@ void ParallelView::render(RayImage* image, World *world, int depth)
             world->trace(&rImage.at(i,j));
 
             TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
-                  i,j,rImage[i][j].m_colour.snprint(trcbuf,32));
+                  i,j,rImage.at(i,j).m_colour.snprint(trcbuf,32));
         }
     }
 }
