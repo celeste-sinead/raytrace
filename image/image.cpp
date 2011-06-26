@@ -29,6 +29,7 @@
 
 #include "util/trace.h"
 #include "util/unit.h"
+#include "rayImage.h"
 #include "colour.h"
 
 static trc_ctl_t imgTrace = {
@@ -39,48 +40,105 @@ static trc_ctl_t imgTrace = {
 #define TRACE(level, args...) \
     trc_printf(&imgTrace,level,1,args)
 
-RayColourImage::RayColourImage(RayImage & ray) :
-    NumericImage<RayColour>(ray.height(), ray.width())
+Image::Image(unsigned width, unsigned height, unsigned colours) :
+    m_pixels(0), m_width(0), m_height(0), m_colours(0)
 {
-    for(int i=0; i<height(); ++i) {
-        for(int j=0; j<width(); ++j) {
-            at(i,j) = ray.at(i,j).m_colour;
-        }
-    }
+    resize(width, height, colours);
 }
 
-DisplayImage::DisplayImage(RayColourImage &ray, ColourAdapter &adapter) :
-    NumericImage<DisplayColour>(ray.height(), ray.width())
-{
-    for(int i=0; i<height(); ++i) {
-        for(int j=0; j<width(); ++j) {
-            adapter.convert(&(ray.at(i,j)), &at(i,j));
-        }
-    }
+Image::~Image() {
+    resize(0, 0, 0);
 }
 
-//! Converts a RayImage to Ascii
-void AsciiImage::fromRay(RayImage* ray, ColourAdapter* adapter, double threshold)
-{
-    double intensity;
-    for( int i=0; (i<ray->height()) && (i<height()); ++i ) {
-        for( int j=0; (j<ray->width()) && (j<width()); ++j ) {
-            RayColour & curC = ray->at(i,j).m_colour;
-            intensity = curC.b + curC.g + curC.r;
-            intensity /= 3.0;
-            at(i,j) = (intensity>=threshold) ? ' ' : 'X';
+double** Image::allocPix(unsigned width, unsigned height, unsigned colours) {
+    // Alloc array of pointers to images for each colour
+    double **pix = new double* [colours];
+    if (!pix) return 0;
+
+    // Alloc image for each colour
+    int i;
+    bool failed=false;
+    for(i=0; i<(int)(colours); ++i) {
+        pix[i] = new double[width * height];
+        if (!pix[i]) {
+            failed = true;
+            break;
         }
     }
+
+    if (!failed) return pix;
+
+    // Unwind on partial alloc fail.
+    for(i=0; --i >= 0;) {
+        delete [] pix[i];
+    }
+    delete pix;
+    return 0;
 }
 
-//! Prints this image to a file
-void AsciiImage::print(FILE* outFile)
-{
-    for( int y=0; y<height(); ++y) {
-        for( int x=0; x<width(); ++x ) {
-            fprintf(outFile,"%c",at(y,x)); 
-        }
-        fprintf(outFile,"\n");
+void Image::freePix(double **pix, unsigned colours) {
+    for(unsigned i=0; i<colours; ++i) {
+        delete [] pix[i];
     }
+    delete [] pix;
+}
+
+int Image::resize(unsigned width, unsigned height, unsigned colours) {
+    if((width == m_width) && (height == m_height) && (colours == m_colours)) {
+        return 0;
+    }
+
+    double **newPix = 0;
+    if (width && height && colours) {
+        newPix = allocPix(width, height, colours);
+    }
+
+    if (width && height && colours && (!newPix)) {
+        // Alloc failed
+        return -1;
+    }
+
+    freePix(m_pixels, m_colours);
+
+    m_pixels = newPix;
+    m_width = width;
+    m_height = height;
+    m_colours = colours;
+    return 0;
+}
+
+Image& Image::swap(Image& other) {
+    double **myPix = m_pixels;
+    double myW = m_width;
+    double myH = m_height;
+    double myC = m_colours;
+
+    m_pixels = other.m_pixels;
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_colours = other.m_colours;
+
+    other.m_pixels = myPix;
+    other.m_width = myW;
+    other.m_height = myH;
+    other.m_colours = myC;
+
+    return *this;
+}
+
+int Image::fromRay(const RayImage& ray) {
+    if (resize(ray.width(), ray.height(), 3)) {
+        return -1;
+    }
+
+    for(unsigned i=0; i<ray.height(); ++i) {
+        for(unsigned j=0; j<ray.width(); ++j) {
+            m_pixels[RED][i*m_width + j] = ray.at(i,j).m_colour.r;
+            m_pixels[GREEN][i*m_width + j] = ray.at(i,j).m_colour.g;
+            m_pixels[BLUE][i*m_width + j] = ray.at(i,j).m_colour.b;
+        }
+    }
+
+    return 0;
 }
 

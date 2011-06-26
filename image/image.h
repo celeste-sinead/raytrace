@@ -34,130 +34,50 @@
 #include "trace/ray.h"
 #include "colour.h"
 
-class DisplayColour;
-class ColourAdapter;
-class QPaintEvent;
+class RayImage;
 
-/*  Image data storage template, which provides functionality for
- *  storage of an image whose elements have (nearly) arbitrary type. 
- *  This should be the base of all image classes.
- *  Template type must define the assignment operator.
- *  As per convention in images, pixels are indexed such that 
- *  (0,0) is the top left pixel, x indices increase right, and y
- *  indices increase down */
-template<typename PixT>
-class ImageData {
-protected:
-    int      m_width;
-    int      m_height;
-    PixT   **m_pixels;
-    
-public:
-    ImageData(int height = 0, int width = 0, PixT* fillColour = 0 );
-    ImageData(const ImageData<PixT> & other);
-    virtual ~ImageData();
- 
-    /** Image size access */
-    int height() 
-        { return m_height; }
-    int width() 
-        { return m_width; }
-    /** Resize image.  Existing data is truncated, or padded, depending
-     *  on size change.  If allocation fails, size will be set to 0x0 */
-    void setSize(int height, int width, PixT *fillColour=0);
-   
-    /** Fill the image with a particular colour */
-    void fill(PixT &fillColour);
-   
-    /** Access pixels. */
-    PixT& at(int yInx, int xInx)
-        { return m_pixels[yInx][xInx]; }
-    PixT *operator[](int yInx)
-        { return m_pixels[yInx]; }
+class Image {
+private:
+    double **m_pixels;
+    unsigned m_width;
+    unsigned m_height;
+    unsigned m_colours;
 
 private:
-    /** Frees memory used to store the image */
-    void freePix();
-};
+    // Don't copy:
+    Image(const Image& other);
+    Image& operator=(const Image& other);
 
-/** Template for images which have pixels of numeric type.
- *  This class provides basic image processing algorithms, and relies
- *  on the following operators being defined for the template type:
- *  - assignment, including assignment to '0'
- *  - subtraction (between PixT) and unary negation
- *  - multiplication and division (by PixT and by double) */
-template<typename PixT>
-class NumericImage : public ImageData<PixT> {
-public:
-    /** A filter kernel */
-    typedef ImageData<PixT> Kernel;
+    double** allocPix(unsigned width, unsigned height, unsigned colours);
+    void freePix(double **pix, unsigned colours);
 
 public:
-    NumericImage(int height = 0, int width = 0, PixT* fillColor = 0) :
-        ImageData<PixT>(height, width, fillColor)
-        {}
-    NumericImage( const NumericImage<PixT> & other ) :
-        ImageData<PixT>(other)
-        {}
+    Image(unsigned width=0, unsigned height=0, unsigned colours=3);
+    virtual ~Image();
 
-    /** Apply a given filter kernel to this image.
-     *  @param filter  The kernel to apply.  Typically this will be square,
-     *                 with odd width and height, but this is not a strict
-     *                 requirement.  If width or height are even, then
-     *                 the extra elements are considered to be right of / above
-     *                 the kernel centre */
-    void filter(Kernel &kernel);
+    /* Resizes this image to the dimensions of the given RayImage and
+     * copies the colours of the rays in the RayImage to this image's
+     * pixels.
+     * @return 0 on success, -1 on failure (allocation failure) */
+    int fromRay(const RayImage& ray);
 
-    void resize(int newHeight, int newWidth);
+    /* Swap the contents of this image with another.
+     * (Useful for not-in-place transforms, etc) 
+     * @return a reference to this */
+    Image& swap(Image &other);
 
-    /** Fetch a pixel, allowing indices to go outside of bounds, with a zero
-     *  slope boundary condition */
-    PixT & framedGet(int yInx, int xInx);
+    unsigned width() const {return m_width;}
+    unsigned height() const {return m_height;}
+    unsigned colours() const {return m_colours;}
+
+    double& at(unsigned row, unsigned col, unsigned colour)
+        {return m_pixels[colour][row*m_width + col];}
+    double at(unsigned row, unsigned col, unsigned colour) const
+        {return m_pixels[colour][row*m_width + col];}
+
+    /* Resizes image.  If new alloc fails, size doesn't change.
+     * @returns 0 on success, -1 on failed alloc */
+    int resize(unsigned width, unsigned height, unsigned colours);
 };
-
-/** An image containing traced rays */
-class RayImage : public ImageData<Ray> {
-public:
-    RayImage(int height=0, int width=0, Ray* fillColour=0) :
-        ImageData<Ray>(height,width,fillColour)
-        { }
-};
-
-/** An image containing HDR ray colours */
-class RayColourImage : public NumericImage<RayColour> {
-public:
-    RayColourImage(RayImage &ray);
-};
-
-/** An image composed of displayable colours */
-class DisplayImage : public NumericImage<DisplayColour> {
-public:
-    DisplayImage(RayColourImage &ray, ColourAdapter &adapter);
-};
-
-/** A binary image rendered in text (for testing). i.e colours below
- *  a threshold are rendered as 'X' and others are rendered as a space */
-class AsciiImage : public ImageData<char> {
-public:
-    AsciiImage(int height=0, int width=0, char *fill=0 ) :
-        ImageData<char>(height,width,fill)
-        { }
-     
-    /** Convert from a RayImage. 
-     *  @param ray       The RayImage to convert from
-     *  @param adapter   The colour adapter to use
-     *  @param threshold The minimum DisplayColour intensity to consider
-     *                   'bright'  (RGB are averaged to get intensity) */
-    void fromRay( RayImage * ray, ColourAdapter * adapter, double threshold);
-    
-    //! Prints the ascii image to a file
-    void print( FILE * outFile = stdout );
-};
-
-//! Include template function definitions
-// inside_image_h_ is used to protect against inclusion elsewhere
-#define inside_image_h_
-#include "image.template.h"
-#undef inside_image_h_
 
 #endif //image_h_

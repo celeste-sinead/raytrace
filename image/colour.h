@@ -38,6 +38,10 @@
 class Ray;
 class RayImage;
 
+enum ColourIndices {
+    RED, GREEN, BLUE
+};
+
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
 class RayColour {
@@ -72,38 +76,6 @@ public:
     
     //! Print this colour to a string, with maximum length.  Return the string.
     char* snprint(char* buf, int maxLen) const;
-};
-
-/** A displayable colour.  That is, a colour whose values are all constrained
- *  to lie in the range [0,1].  The main difference between a RayColour and a
- *  DisplayColour is logical (different allowable ranges) */
-class DisplayColour: public RayColour {
-public:
-    DisplayColour() : RayColour() {}
-    DisplayColour(double cr, double cg, double cb) : RayColour(cr, cg, cb) {}
-    DisplayColour(const DisplayColour &other) : RayColour(other) {}
-
-    /** Convert to arbitrary integer color depth.  Depth is in bits */
-    unsigned long red(unsigned int depth)
-        { return r*((1<<depth) - 1); }
-    unsigned long green(unsigned int depth)
-        { return g*((1<<depth) - 1); }
-    unsigned long blue(unsigned int depth)
-        { return b*((1<<depth) - 1); }
-
-    //! Assignment
-    DisplayColour& operator=(const DisplayColour& other);
-    DisplayColour& operator=(double other);
-    //! Elementwise multiplication:
-    DisplayColour operator*(const DisplayColour& other);
-    //! Scaling:
-    DisplayColour operator*(double other);
-    friend DisplayColour operator*(double left, const DisplayColour& right);
-    //! Elementwise addition/subtraction:
-    DisplayColour operator+(const DisplayColour& other);
-    DisplayColour operator-(const DisplayColour& other);
-    //! Access colours r, g, b (convenient for iteration)
-    double& operator[](int inx);
 };
 
 /** Provides a strategy for converting between a high dynamic range RayColour

@@ -28,6 +28,7 @@
 
 #include "trace/ray.h"
 #include "image.h"
+#include "rayImage.h"
 
 //! Set all components of the colour
 void RayColour::set(double r, double g, double b)
@@ -142,9 +143,9 @@ LinearColourAdapter::LinearColourAdapter(RayImage *image)
     /* Find the image max and min */
     m_min = image->at(0,0).m_colour[0];
     m_max = image->at(0,0).m_colour[0];
-    for(int i=0; i<image->width(); ++i) {
-        for(int j=0; j<image->height(); ++j) {
-            for(int k=0; k<3; ++k) {
+    for(unsigned i=0; i<image->width(); ++i) {
+        for(unsigned j=0; j<image->height(); ++j) {
+            for(unsigned k=0; k<3; ++k) {
                 if( image->at(i,j).m_colour[k] < m_min ) 
                     m_min = image->at(i,j).m_colour[k];
                 if( image->at(i,j).m_colour[k] > m_max )
