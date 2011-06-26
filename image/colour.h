@@ -35,11 +35,30 @@
 #ifndef colour_h_
 #define colour_h_
 
+#include "image/transform.h"
+
 class Ray;
 class RayImage;
 
 enum ColourIndices {
     RED, GREEN, BLUE
+};
+
+/* Converts the unbounded positive HDR colours used in tracing
+ * into the [0,1] range used for RGB display, with a simple
+ * linear scale */
+class LinearHDRToDisplay : public ImageTransform {
+private:
+    /* Range of intensities for linear range: */
+    double m_min;
+    double m_max;  
+
+public:
+    LinearHDRToDisplay(double min, double max) :
+        m_min(min), m_max(max)
+        { }
+
+    virtual Image& apply(Image &img);
 };
 
 /** A colour, for use within graphics calculations.  Intensity is positive,
@@ -76,32 +95,6 @@ public:
     
     //! Print this colour to a string, with maximum length.  Return the string.
     char* snprint(char* buf, int maxLen) const;
-};
-
-/** Provides a strategy for converting between a high dynamic range RayColour
- *  and a displayable DisplayColour */
-class ColourAdapter {
-public:
-    /** Converts a traced ray (which should have colour, depth, child, etc.
-     *  information) into a displayable colour 
-     *  @param source The ray to colour
-     *  @param dest   The DisplayColour instance to fill */
-    virtual void convert(RayColour * source, DisplayColour * dest) = 0;  
-};
-
-/** Implements a simple linear scaling */
-class LinearColourAdapter: public ColourAdapter {
-private:
-    /** Range of intensities for linear range: */
-    double m_min;
-    double m_max;  
-public:
-	LinearColourAdapter(double min, double max) : 
-        m_min(min), m_max(max) 
-        {}  
-    LinearColourAdapter(RayImage *image);
-
-    virtual void convert(RayColour * source, DisplayColour * dest);
 };
 
 #endif

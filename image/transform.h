@@ -29,7 +29,7 @@ class ImageTransform {
 public:
     /* Applies this transform to the given image.
      * @return the given image, transformed. */
-    virtual Image* apply(Image* img) = 0;
+    virtual Image& apply(Image& img) = 0;
 };
 
 #endif //TRAMSFORM_H_

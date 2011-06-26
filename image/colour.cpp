@@ -83,46 +83,6 @@ double& RayColour::operator[](int inx) {
     };
 }
 
-DisplayColour& DisplayColour::operator=(const DisplayColour& other)
-{
-    set(other.r, other.g, other.b);
-    return *this;
-}
-DisplayColour& DisplayColour::operator=(double other)
-{
-    set(other, other, other);
-    return *this;
-}
-DisplayColour DisplayColour::operator*(const DisplayColour& other)
-{
-    return DisplayColour(r*other.r, g*other.g, b*other.b);
-}
-DisplayColour DisplayColour::operator*(double other)
-{
-    return DisplayColour(r*other, g*other, b*other);
-}
-DisplayColour operator*(double left, const DisplayColour & other)
-{
-    return DisplayColour(left*other.r, left*other.g, left*other.b);
-}
-DisplayColour DisplayColour::operator+(const DisplayColour& other)
-{
-    return DisplayColour(r+other.r, g+other.g, b+other.b);
-}
-DisplayColour DisplayColour::operator-(const DisplayColour& other)
-{
-    return DisplayColour(r-other.r, g-other.g, b-other.b);
-}
-double& DisplayColour::operator[](int inx) {
-    switch(inx) {
-        case 0: return r;
-        case 1: return g;
-        case 2: return b;
-        default: abort();
-    };
-}
-
-
 //! Print this colour to a string
 char* RayColour::snprint(char *buf, int maxLen) const
 {
@@ -131,38 +91,20 @@ char* RayColour::snprint(char *buf, int maxLen) const
     return buf;
 }
 
-//! Find max and min in image, for conversion range
-LinearColourAdapter::LinearColourAdapter(RayImage *image)
-{
-    if( (image->width()==0) || (image->height() == 0) ) {
-        m_min = 0.0;
-        m_max = 1.0;
-        return;
-    }
 
-    /* Find the image max and min */
-    m_min = image->at(0,0).m_colour[0];
-    m_max = image->at(0,0).m_colour[0];
-    for(unsigned i=0; i<image->width(); ++i) {
-        for(unsigned j=0; j<image->height(); ++j) {
-            for(unsigned k=0; k<3; ++k) {
-                if( image->at(i,j).m_colour[k] < m_min ) 
-                    m_min = image->at(i,j).m_colour[k];
-                if( image->at(i,j).m_colour[k] > m_max )
-                    m_max = image->at(i,j).m_colour[k];
+//! Straightforward linear colour conversion
+Image& LinearHDRToDisplay::apply(Image &img)
+{
+    for (unsigned i=0; i < img.height(); ++i) {
+        for (unsigned j=0; j < img.width(); ++j) {
+            for (unsigned k=0; k < img.colours(); ++k) {
+                img.at(i,j,k) = (img.at(i,j,k)-m_min) / (m_max - m_min);
+                if (img.at(i,j,k) > 1.0) img.at(i,j,k) = 1.0;
+                if (img.at(i,j,k) < 0.0) img.at(i,j,k) = 0;
             }
         }
     }
-}
 
-//! Straightforward linear colour conversion
-void LinearColourAdapter::convert(RayColour* source, DisplayColour* dest)
-{
-    dest->r = (source->r-m_min) / (m_max-m_min);
-    if( dest->r > 1.0 ) dest->r = 1.0;
-    dest->g = (source->g-m_min) / (m_max-m_min);
-    if( dest->g > 1.0 ) dest->g = 1.0;
-    dest->b = (source->b-m_min) / (m_max-m_min);
-    if( dest->b > 1.0 ) dest->b = 1.0;
+    return img;
 }
 
