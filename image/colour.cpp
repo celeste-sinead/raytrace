@@ -108,3 +108,9 @@ Image& LinearHDRToDisplay::apply(Image &img)
     return img;
 }
 
+// Converts double colour to int colour
+unsigned long intColour(double value, unsigned bits) {
+    unsigned long ret = value * (double)((1<<bits) - 1);
+    return ret % (1<<bits);
+}
+

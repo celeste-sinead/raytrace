@@ -23,6 +23,7 @@
 #include <QtGui>
 
 #include "image/image.h"
+#include "image/rayImage.h"
 #include "trace/lighting.h"
 #include "trace/rayObject.h"
 #include "trace/view.h"
@@ -37,8 +38,8 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
-    const int w = 1500;
-    const int h = 1000;
+    const int w = 900;
+    const int h = 600;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
@@ -82,14 +83,17 @@ void qtTest(QApplication &app) {
     view.m_xVec = RayVector(0,4.5,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage image (h, w);
+    RayImage traced (w, h);
 
-    view.render(&image, &world, 20);
+    view.render(&traced, &world, 20);
 
-    RayColourImage      rcimg(image);
-    LinearColourAdapter colour(0.0,1.0);
-    DisplayImage        dimg(rcimg, colour);
-    ImageWidget *visImage = new ImageWidget(&dimg);
+    Image img;
+    img.fromRay(traced);
+
+    LinearHDRToDisplay hdrtd (0.0,1.0);
+    hdrtd.apply(img);
+
+    ImageWidget *visImage = new ImageWidget(img);
 
     QHBoxLayout *imgs = new QHBoxLayout();
     imgs->addWidget(visImage);

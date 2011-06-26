@@ -25,19 +25,22 @@
 
 #include <QWidget>
 #include <QImage>
+#include <QColor>
 
-class DisplayImage;
+class Image;
 
 class ImageWidget : public QWidget { 
 Q_OBJECT
 private:
     QImage m_image;
 
+    QColor toQColor(Image &img, unsigned i, unsigned j);
+
 protected:
     void paintEvent(QPaintEvent *event);
 
 public:
-    ImageWidget(DisplayImage *img, QWidget *parent = 0);
+    ImageWidget(Image &img, QWidget *parent = 0);
 
     virtual QSize sizeHint() const 
         { return m_image.size(); }

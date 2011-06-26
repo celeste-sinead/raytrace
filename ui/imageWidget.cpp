@@ -37,21 +37,17 @@ static trc_ctl_t imgWidgetTrace = {
 #define TRACE(level, args...) \
     trc_printf(&imgWidgetTrace,level,1,args)
 
-ImageWidget::ImageWidget(DisplayImage *img, QWidget * parent) :
+ImageWidget::ImageWidget(Image &img, QWidget * parent) :
     QWidget(parent),
-    m_image(img->width(), img->height(), QImage::Format_ARGB32)
+    m_image(img.width(), img.height(), QImage::Format_ARGB32)
 { 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     TRACE(TRC_INFO, "Created new ImageWidget, %dx%d\n", 
         m_image.width(), m_image.height());
-    QColor curC;
-    for(int i=0; i<img->height(); ++i) {
-        for(int j=0; j<img->width(); ++j) {
-            curC = QColor(img->at(i,j).red(8),
-                           img->at(i,j).green(8),
-                           img->at(i,j).blue(8));
-            m_image.setPixel(j, i, curC.rgb());
+    for(unsigned i=0; i<img.height(); ++i) {
+        for(unsigned j=0; j<img.width(); ++j) {
+            m_image.setPixel(j, i, toQColor(img, i, j).rgb());
         }
     }
 }
@@ -61,5 +57,12 @@ void ImageWidget::paintEvent(QPaintEvent *event)
     TRACE(TRC_DTL, "Painted ImageWidget\n");
     QPainter painter(this);
     painter.drawImage(QPoint(0,0), m_image);
+}
+
+QColor ImageWidget::toQColor(Image &img, unsigned i, unsigned j) {
+    return QColor(
+            intColour(img.at(i,j,RED), 8),
+            intColour(img.at(i,j,GREEN), 8),
+            intColour(img.at(i,j,BLUE), 8) );
 }
 

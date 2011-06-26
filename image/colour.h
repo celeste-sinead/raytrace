@@ -61,6 +61,10 @@ public:
     virtual Image& apply(Image &img);
 };
 
+/* Converts a colour represented by a double in the range [0,1]
+ * into an int of the specified number of bits */
+unsigned long intColour(double value, unsigned bits);
+
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
 class RayColour {
