@@ -7,14 +7,18 @@
  * The RayColour class is intended for ray trace calculations.  It uses double
  * precision math to track colours within graphics space.  These are unbounded
  * intensity values, which may be translated to a more subjective colour space
- * just in time for display.
+ * just in time for display.  Within tracing calculations, arithmetic and
+ * assignment of a colour set is common, so it is worthwhile to have a class
+ * with overloaded operators.
  *
- * The DisplayColour class is a more typical RGB colour class.  It uses 
- * double values in the range [0.0,1.0] to represent RGB colour components.
- * 
- * Also defined are the ColourAdapter classes, which implement various
- * schemes for translating between the high dynamic range RayColour and the
- * display-friendly DisplayColour.
+ * Once tracing is completed and we move into the realm of image processing,
+ * it is more useful to view the image as a set of monochrome matrices;
+ * one for each colour.  So the colour objects from the tracing domain
+ * give way to multiple arrays, each containing one colour component.
+ *
+ * Within the realm of tracing, intensities are permitted to be unbounded
+ * positive, i.e. high dynamic range.  Before the image can be displayed,
+ * colours must be mapped into the [0,1.0] display range.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
