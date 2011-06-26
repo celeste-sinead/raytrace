@@ -57,6 +57,11 @@ private:
     int m_depth;
     std::vector<Ray*> m_children;
 
+private:
+    // We would need to do a deep copy.  So, no copying!
+    Ray(const Ray& other);
+    Ray& operator=(const Ray& other);
+
 public:  
     //! A unit vector with the direction of this Ray
     RayVector   m_dir; 
