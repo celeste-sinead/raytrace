@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include "image/image.h"
+#include "image/rayImage.h"
 #include "trace/rayObject.h"
 #include "trace/view.h"
 #include "trace/world.h"

@@ -25,7 +25,8 @@ UI_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Local source files that should be exported to build
 UI_CXX_SRCS:= \
-			  imageWidget.cpp
+			  imageWidget.cpp \
+              asciiDisplay.cpp
 
 # Local headers which declare Qt Objects
 UI_QT_HEADS:= \
