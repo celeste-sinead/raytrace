@@ -29,6 +29,7 @@
 #include "trace/view.h"
 #include "trace/world.h"
 #include "util/unit.h"
+#include "ui/asciiDisplay.h"
 
 void singleSphere();
 
@@ -49,8 +50,8 @@ int main(int argc, char *argv[]) {
 }
 
 void singleSphere() {
-    const int w = 8;
-    const int h = 4;
+    const int w = 36;
+    const int h = 16;
 
     World world;
     world.m_defaultColour.set(1.0,0,0);  // bright red
@@ -64,13 +65,13 @@ void singleSphere() {
     view.m_xVec = RayVector(0,3,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage image (h, w);
+    RayImage traced (w, h);
     
-    view.render(&image, &world);
-    
-    AsciiImage ascii(h, w);
-    ascii.fromRay(&image,0,0.5);
-    ascii.print();
+    view.render(&traced, &world);
 
+    Image display;
+    display.fromRay(traced);
+  
+    displayAscii(display, 0.5);
 }
 

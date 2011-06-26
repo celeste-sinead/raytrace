@@ -23,6 +23,8 @@
 #ifndef ASCII_DISPLAY_H_
 #define ASCII_DISPLAY_H_
 
+class Image;
+
 /* Prints the image in ascii, placing empty spaces where
  * the intensity is less than the threshold, and Xs elsewhere*/
 void displayAscii(Image& img, double threshold);

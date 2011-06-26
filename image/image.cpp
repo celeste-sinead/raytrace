@@ -51,6 +51,8 @@ Image::~Image() {
 }
 
 double** Image::allocPix(unsigned width, unsigned height, unsigned colours) {
+    if(!(width && height && colours)) return 0;
+
     // Alloc array of pointers to images for each colour
     double **pix = new double* [colours];
     if (!pix) return 0;
@@ -77,6 +79,8 @@ double** Image::allocPix(unsigned width, unsigned height, unsigned colours) {
 }
 
 void Image::freePix(double **pix, unsigned colours) {
+    if (!pix) return;
+
     for(unsigned i=0; i<colours; ++i) {
         delete [] pix[i];
     }

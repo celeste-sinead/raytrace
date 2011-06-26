@@ -50,11 +50,12 @@ COMMON_OBJS:= \
 
 test_OBJS:= \
 	$(COMMON_OBJS) \
+    gen/ui/asciiDisplay.o \
 	gen/test.o
 
 trace-ui_OBJS:= \
 	$(COMMON_OBJS) \
-	$(patsubst %.cpp,$(GENDIR)/%.o,$(UI_CXX_SRCS)) \
+    gen/ui/imageWidget.o \
 	gen/ui/imageWidget.moc.o \
 	gen/trace-ui.o
 
