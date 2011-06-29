@@ -35,13 +35,13 @@ Image& NearestNeighbor::apply(Image &img) {
     return img;
   }
 
-  double xScale = (double)(this->m_xPix) / img.width();
-  double yScale = (double)(this->m_yPix) / img.height();
+  double xScale = (double)(img.width()) / this->m_xPix;
+  double yScale = (double)(img.height()) / this->m_yPix;
 
   for (unsigned i=0; i < m_yPix; ++i) {
     for (unsigned j=0; j < m_xPix; ++j) {
-      unsigned srcI = yScale * i + 0.5;
-      unsigned srcJ = xScale * j + 0.5;
+      double srcI = yScale * i + 0.5;
+      double srcJ = xScale * j + 0.5;
       for (unsigned k=0; k < resampled.colours(); ++k) {
         resampled.at(i, j, k) = img.at(srcI, srcJ, k);
       }
