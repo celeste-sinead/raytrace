@@ -67,8 +67,7 @@ bool SphereSource::colour(Ray* inbound, World* world)
 {
     /* Calculate decrease in intensity due to distance, as above */
     double dist = inbound->m_intersectDist;
-    double scale = 1.0 / (4.0*M_PI*dist*dist);
-    inbound->m_colour = scale * m_intensity;
+    inbound->m_colour = m_intensity;
     return true;
 }
 
