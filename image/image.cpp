@@ -46,8 +46,31 @@ Image::Image(unsigned width, unsigned height, unsigned colours) :
     resize(width, height, colours);
 }
 
+Image::Image(const Image &other) :
+	m_pixels(0), m_width(0), m_height(0), m_colours(0)
+{
+		resize(other.width(), other.height(), other.colours());
+		if (!m_pixels) {
+			// alloc failed
+			return;
+		}
+
+		other.copyPix(m_pixels);
+}
+
 Image::~Image() {
     resize(0, 0, 0);
+}
+
+Image& Image::operator=(const Image& other) {
+		resize(other.width(), other.height(), other.colours());
+		if (!m_pixels) {
+			// alloc failed
+			return *this;
+		}
+
+		other.copyPix(m_pixels);
+		return *this;
 }
 
 double** Image::allocPix(unsigned width, unsigned height, unsigned colours) {
@@ -85,6 +108,12 @@ void Image::freePix(double **pix, unsigned colours) {
         delete [] pix[i];
     }
     delete [] pix;
+}
+
+void Image::copyPix(double **dst) const {
+	for (unsigned k=0; k < m_colours; ++k) {
+		memcpy(dst[k], m_pixels[k], m_width * m_height * sizeof(double));
+	}
 }
 
 int Image::resize(unsigned width, unsigned height, unsigned colours) {

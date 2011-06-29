@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
-    const int w = 450;
-    const int h = 300;
+    const int w = 900;
+    const int h = 600;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
@@ -94,13 +94,23 @@ void qtTest(QApplication &app) {
 
     LinearHDRToDisplay hdrtd (0.0,1.0);
     hdrtd.apply(img);
-		NearestNeighbor nn (900, 600);
-		nn.apply(img);
 
-    ImageWidget *visImage = new ImageWidget(img);
+		Image nni (img);
+		NearestNeighbor nn (690, 460);
+		nn.apply(nni);
+
+		Image bti (img);
+		BilinearInterpolator bt (690, 460);
+		bt.apply(bti);
+
+		ImageWidget *oiw = new ImageWidget(img);
+    ImageWidget *nniw = new ImageWidget(nni);
+		ImageWidget *btiw = new ImageWidget(bti);
 
     QHBoxLayout *imgs = new QHBoxLayout();
-    imgs->addWidget(visImage);
+		imgs->addWidget(oiw);
+    //imgs->addWidget(nniw);
+		//imgs->addWidget(btiw);
 
     QWidget *topWidget = new QWidget();
     topWidget->setLayout(imgs);

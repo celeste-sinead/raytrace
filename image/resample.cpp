@@ -21,6 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
+#include <cmath>
+
 #include "resample.h"
 
 #include "image.h"
@@ -28,20 +30,20 @@
 // Resample according to nearest neighbor
 Image& NearestNeighbor::apply(Image &img) {
   // Allocate new image for resampled data
-  Image resampled (this->m_xPix, this->m_yPix, img.colours());
+  Image resampled (m_xPix, m_yPix, img.colours());
 
   if ((resampled.width() != m_xPix) || (resampled.height() != m_yPix)) {
     // Alloc failure!
     return img;
   }
 
-  double xScale = (double)(img.width()) / this->m_xPix;
-  double yScale = (double)(img.height()) / this->m_yPix;
+  double xScale = (double)(img.width()) / m_xPix;
+  double yScale = (double)(img.height()) / m_yPix;
 
   for (unsigned i=0; i < m_yPix; ++i) {
     for (unsigned j=0; j < m_xPix; ++j) {
-      double srcI = yScale * i + 0.5;
-      double srcJ = xScale * j + 0.5;
+      double srcI = yScale * i;
+      double srcJ = xScale * j;
       for (unsigned k=0; k < resampled.colours(); ++k) {
         resampled.at(i, j, k) = img.at(srcI, srcJ, k);
       }
@@ -51,3 +53,57 @@ Image& NearestNeighbor::apply(Image &img) {
   // Swap resampled data for old data
   return img.swap(resampled);
 }
+
+// Resample with the bilinear transform
+Image& BilinearInterpolator::apply(Image &img) {
+  // Allocate new image for resampled datta
+  Image resampled (m_xPix, m_yPix, img.colours());
+
+  if ((resampled.width() != m_xPix) || (resampled.height() != m_yPix)) {
+    // Alloc failure!
+    return img;
+  }
+
+  double xScale = (double)(img.width()-1) / m_xPix;
+  double yScale = (double)(img.height()-1) / m_yPix;
+
+  for (unsigned i=0; i < m_yPix; ++i) {
+    for (unsigned j=0; j < m_xPix; ++j) {
+      /* Scale dest i and j coords to src i and j coords */
+      double iInSrc = yScale * i;
+      double jInSrc = xScale * j;
+
+      doBilinearSample(img, resampled, iInSrc, jInSrc, i, j);
+    }
+  }
+
+  // Swap resampled data for old data
+  return img.swap(resampled);
+}
+
+// Samples a single point with bilinear transform.
+void BilinearInterpolator::doBilinearSample(
+    Image &src, Image &dst, double srcI, double srcJ, int dstI, int dstJ) 
+{
+  for (unsigned k=0; k < src.colours(); ++k) {
+    if ((srcI == (int)(srcI)) && (srcJ == (int)(srcJ))) {
+      /* If source and dest coords are exactly the same, no need
+       * to average. */
+      dst.at(dstI, dstJ, k) = src.at(srcI, srcJ, k);
+      continue;
+    }
+
+    /* Values for four corners surrounding point: */
+    double ul = src.at(srcI, srcJ, k);
+    double ur = src.at(srcI, srcJ + 1.0, k);
+    double ll = src.at(srcI + 1.0, srcJ, k);
+    double lr = src.at(srcI + 1.0, srcJ + 1.0, k);
+
+    /* Interpolate in x direction, along top and bottom edges */
+    double top = ul + (ur - ul)*(srcJ - (int)(srcJ));
+    double bottom = ll + (lr - ll)*(srcJ - (int)(srcJ));
+
+    dst.at(dstI, dstJ, k) = top + (bottom-top)*(srcI - (int)(srcI));
+  }
+}
+

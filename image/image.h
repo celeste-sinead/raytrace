@@ -44,15 +44,14 @@ private:
     unsigned m_colours;
 
 private:
-    // Don't copy:
-    Image(const Image& other);
-    Image& operator=(const Image& other);
-
     double** allocPix(unsigned width, unsigned height, unsigned colours);
     void freePix(double **pix, unsigned colours);
+    void copyPix(double **dst) const;
 
 public:
     Image(unsigned width=0, unsigned height=0, unsigned colours=3);
+    Image(const Image& other);
+    Image& operator=(const Image& other);
     virtual ~Image();
 
     /* Resizes this image to the dimensions of the given RayImage and

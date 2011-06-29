@@ -44,4 +44,22 @@ public:
   virtual Image& apply(Image &img);
 };
 
+/* A bilinear transform resampler.  Each resampled pixel is the 
+ * average of the four nearest source pixels, weighted by distance */
+class BilinearInterpolator: public ImageTransform {
+private:
+  unsigned m_xPix;
+  unsigned m_yPix;
+
+  void doBilinearSample(Image &src, Image &dst, double srcI, double srcJ, 
+      int dstI, int dstJ);
+
+public:
+  BilinearInterpolator(unsigned width, unsigned height) :
+    m_xPix(width), m_yPix(height) 
+    { /* nothing to do */ }
+
+  virtual Image& apply(Image &img);
+};
+
 #endif //RESAMPLE_H_
