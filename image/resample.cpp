@@ -1,8 +1,9 @@
 /******************************************************************************
- * transform.h
+ * resample.cpp
  * Copyright 2011 Iain Peet
  *
- * Defines an abstract class for all operations which transform an image.
+ * Provides image transforms which resample images (typically, this is done
+ * to resize the image)
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -20,16 +21,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#include "resample.h"
 
-class Image;
+#include "image.h"
 
-class ImageTransform {
-public:
-    /* Applies this transform to the given image.
-     * @return the given image, transformed. */
-    virtual Image& apply(Image& img) = 0;
-};
+// Resample according to nearest neighbor
+Image& NearestNeighbor::apply(Image &img) {
+  // Allocate new image for resampled data
+  Image resampled (this->m_xPix, this->m_yPix, img.colours());
 
-#endif //TRAMSFORM_H_
+  if ((resampled.width() != m_xPix) || (resampled.height() != m_yPix)) {
+    // Alloc failure!
+    return img;
+  }
+
+  double xScale = (double)(this->m_xPix) / img.width();
+  double yScale = (double)(this->m_yPix) / img.height();
+
+  for (unsigned i=0; i < m_yPix; ++i) {
+    for (unsigned j=0; j < m_xPix; ++j) {
+      unsigned srcI = yScale * i + 0.5;
+      unsigned srcJ = xScale * j + 0.5;
+      for (unsigned k=0; k < resampled.colours(); ++k) {
+        resampled.at(i, j, k) = img.at(srcI, srcJ, k);
+      }
+    }
+  }
+
+  // Swap resampled data for old data
+  return img.swap(resampled);
+}

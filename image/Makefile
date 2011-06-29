@@ -27,7 +27,8 @@ IMAGE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 IMAGE_CXX_SRCS:= \
                  colour.cpp \
                  image.cpp \
-                 rayImage.cpp
+                 rayImage.cpp \
+								 resample.cpp
 
 # Prepend the current directory name
 IMAGE_CXX_SRCS:= $(patsubst %,$(IMAGE_DIR)%,$(IMAGE_CXX_SRCS)) 

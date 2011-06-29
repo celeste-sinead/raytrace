@@ -1,8 +1,9 @@
 /******************************************************************************
- * transform.h
+ * resample.h
  * Copyright 2011 Iain Peet
  *
- * Defines an abstract class for all operations which transform an image.
+ * Provides image transforms which resample images (typically, this is done
+ * to resize the image)
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -20,16 +21,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#ifndef RESAMPLE_H_
+#define RESAMPLE_H_
+
+#include "image/transform.h"
 
 class Image;
 
-class ImageTransform {
+/* A simple nearest neighbor resampler.  Each resampled pixel takes on
+ * the value of the nearest source pixel.  This is very fast, but not
+ * particularly pretty */
+class NearestNeighbor: public ImageTransform {
+private:
+  unsigned m_xPix;
+  unsigned m_yPix;
+
 public:
-    /* Applies this transform to the given image.
-     * @return the given image, transformed. */
-    virtual Image& apply(Image& img) = 0;
+  NearestNeighbor(unsigned width, unsigned height) :
+    m_xPix(width), m_yPix(height) 
+    { /* nothing to do */ }
+
+  virtual Image& apply(Image &img);
 };
 
-#endif //TRAMSFORM_H_
+#endif //RESAMPLE_H_

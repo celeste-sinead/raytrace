@@ -22,8 +22,10 @@
 
 #include <QtGui>
 
+#include "image/colour.h"
 #include "image/image.h"
 #include "image/rayImage.h"
+#include "image/resample.h"
 #include "trace/lighting.h"
 #include "trace/rayObject.h"
 #include "trace/view.h"
@@ -38,8 +40,8 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
-    const int w = 900;
-    const int h = 600;
+    const int w = 450;
+    const int h = 300;
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
@@ -92,6 +94,8 @@ void qtTest(QApplication &app) {
 
     LinearHDRToDisplay hdrtd (0.0,1.0);
     hdrtd.apply(img);
+		NearestNeighbor nn (900, 600);
+		nn.apply(img);
 
     ImageWidget *visImage = new ImageWidget(img);
 
