@@ -24,7 +24,8 @@
 .SECONDEXPANSION:
 
 # List of subdir from which to obtain source lists
-SRCDIRS:=image\
+SRCDIRS:= file \
+		 image\
 		 trace\
 		 ui \
 		 util
@@ -46,7 +47,8 @@ BINS:=test trace-ui
 COMMON_OBJS:= \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(IMAGE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(TRACE_CXX_SRCS)) \
-	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) 
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) \
+	$(patsubst %.cpp,$(GENDIR)/%.o,$(FILE_CXX_SRCS)) 
 
 test_OBJS:= \
 	$(COMMON_OBJS) \
@@ -63,7 +65,10 @@ trace-ui_OBJS:= \
 CXX:= g++
 MOC:= moc-qt4
 CXXFLAGS:= -Wall -g -O0
-INCLUDES:= -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4
+INCLUDES:= -I. \
+	-I/usr/include/qt4/QtCore \
+	-I/usr/include/qt4/QtGui \
+	-I/usr/include/qt4 
 LDFLAGS:= $(CXXFLAGS)
 LIBS:= -lm -lQtGui -lQtCore -lpthread
 

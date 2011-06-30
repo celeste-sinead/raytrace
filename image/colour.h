@@ -45,24 +45,38 @@ class Ray;
 class RayImage;
 
 enum ColourIndices {
-    RED, GREEN, BLUE
+  RED, GREEN, BLUE
 };
 
-/* Converts the unbounded positive HDR colours used in tracing
- * into the [0,1] range used for RGB display, with a simple
- * linear scale */
+/* Converts the unbounded positive HDR colours used in tracing into the [0,1] 
+ * range used for RGB display, with a simple linear scale */
 class LinearHDRToDisplay : public ImageTransform {
 private:
-    /* Range of intensities for linear range: */
-    double m_min;
-    double m_max;  
+  /* Range of intensities for linear range: */
+  double m_min;
+  double m_max;  
 
 public:
-    LinearHDRToDisplay(double min, double max) :
-        m_min(min), m_max(max)
-        { }
+  LinearHDRToDisplay(double min, double max) :
+    m_min(min), m_max(max)
+    { }
 
-    virtual Image& apply(Image &img);
+  virtual Image& apply(Image &img);
+};
+
+/** Converts the unbounded positive HDR colours used in tracing into the [0,1] 
+ *  range used for RGB display, with a logarithmic intensity scale */
+class LogHDRToDisplay : public ImageTransform {
+private:
+  double m_min; // this intensity will map to 0.  
+  double m_max; // this intensity will map to 1.0. 
+
+public:
+  LogHDRToDisplay(double min, double max) :
+    m_min(min), m_max(max)
+    { }
+
+  virtual Image& apply(Image &img);
 };
 
 /* Converts a colour represented by a double in the range [0,1]
@@ -73,36 +87,39 @@ unsigned long intColour(double value, unsigned bits);
  *  without bound.  */
 class RayColour {
 public:
-    /** RGB intensity.  These are in range [0.0,infinity] */
-    double r;
-    double g;
-    double b;
+  /** RGB intensity.  These are in range [0.0,infinity] */
+  double r;
+  double g;
+  double b;
 
-    RayColour() : r(0.0), g(0.0), b(0.0)                                   { /* n/a */ }
-    RayColour(double cr, double cg, double cb) : r(cr), g(cg), b(cb)       { /* n/a */ }
-    RayColour(const RayColour &other) : r(other.r), g(other.g), b(other.b) { /* n/a */ }
-    
-    void set(double r, double g, double b);
+  RayColour() : r(0.0), g(0.0), b(0.0)                   
+    { /* n/a */ }
+  RayColour(double cr, double cg, double cb) : r(cr), g(cg), b(cb)     
+    { /* n/a */ }
+  RayColour(const RayColour &other) : r(other.r), g(other.g), b(other.b) 
+    { /* n/a */ }
+  
+  void set(double r, double g, double b);
 
-	//! Length of this colour (intepreted as a 3-vector)
-	double magnitude();
+  //! Length of this colour (intepreted as a 3-vector)
+  double magnitude();
 
-    //! Assignment
-    RayColour& operator=(const RayColour& other);
-    RayColour& operator=(double other);
-    //! Elementwise multiplication:
-    RayColour operator*(const RayColour& other);
-    //! Scaling:
-    RayColour operator*(double other);
-    friend RayColour operator*(double left, const RayColour& right);
-    //! Elementwise addition/subtraction:
-    RayColour operator+(const RayColour& other);
-    RayColour operator-(const RayColour& other);
-    //! Access colours r, g, b (convenient for iteration)
-    double& operator[](int inx);
-    
-    //! Print this colour to a string, with maximum length.  Return the string.
-    char* snprint(char* buf, int maxLen) const;
+  //! Assignment
+  RayColour& operator=(const RayColour& other);
+  RayColour& operator=(double other);
+  //! Elementwise multiplication:
+  RayColour operator*(const RayColour& other);
+  //! Scaling:
+  RayColour operator*(double other);
+  friend RayColour operator*(double left, const RayColour& right);
+  //! Elementwise addition/subtraction:
+  RayColour operator+(const RayColour& other);
+  RayColour operator-(const RayColour& other);
+  //! Access colours r, g, b (convenient for iteration)
+  double& operator[](int inx);
+  
+  //! Print this colour to a string, with maximum length.  Return the string.
+  char* snprint(char* buf, int maxLen) const;
 };
 
 #endif

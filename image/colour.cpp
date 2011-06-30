@@ -93,8 +93,7 @@ char* RayColour::snprint(char *buf, int maxLen) const
 
 
 //! Straightforward linear colour conversion
-Image& LinearHDRToDisplay::apply(Image &img)
-{
+Image& LinearHDRToDisplay::apply(Image &img) {
     for (unsigned i=0; i < img.height(); ++i) {
         for (unsigned j=0; j < img.width(); ++j) {
             for (unsigned k=0; k < img.colours(); ++k) {
@@ -106,6 +105,37 @@ Image& LinearHDRToDisplay::apply(Image &img)
     }
 
     return img;
+}
+
+//! Logarithmic colour mapper
+Image& LogHDRToDisplay::apply(Image &img) {
+	if (m_min < 0) return img;
+	if (m_max < 0) return img;
+	double logMin = log(m_min+1.0);
+	double logMax = log(m_max+1.0);
+
+	for (unsigned i=0; i<img.height(); ++i) {
+		for (unsigned j=0; j<img.width(); ++j) {
+			for (unsigned k=0; k < img.colours(); ++k) {
+				if (img.at(i,j,k) < 0.0) {
+					img.at(i,j,k) = 0;
+					continue;
+				}
+
+				// This gets us into the range [logMin, logMax]
+				double val = log(img.at(i,j,k) + 1.0);
+
+				/* Convert [logMin, logMax] -> [0, 1]  */
+				val = (val-logMin) / (logMax-logMin);
+				if (val < 0.0) val = 0;
+				if (val > 1.0) val = 1.0;
+
+				img.at(i,j,k) = val;
+			}
+		}
+	}
+
+	return img;
 }
 
 // Converts double colour to int colour

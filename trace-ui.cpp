@@ -92,7 +92,8 @@ void qtTest(QApplication &app) {
     Image img;
     img.fromRay(traced);
 
-    LinearHDRToDisplay hdrtd (0.0,1.0);
+    //LinearHDRToDisplay hdrtd (0.0,1.0);
+		LogHDRToDisplay hdrtd (0.0, 3.0);
     hdrtd.apply(img);
 
 		Image nni (img);
