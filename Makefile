@@ -41,6 +41,17 @@ include $(patsubst %,%/Makefile,$(SRCDIRS))
 # Generated directories
 GENDIR:=gen
 
+# Compile config
+CXX:= g++
+MOC:= moc-qt4
+CXXFLAGS:= -Wall -g -O0
+INCLUDES:= -I. \
+	-I/usr/include/qt4/QtCore \
+	-I/usr/include/qt4/QtGui \
+	-I/usr/include/qt4 
+LDFLAGS:= $(CXXFLAGS)
+LIBS:= -lm -lQtGui -lQtCore -lpthread
+
 # List of bins to link
 BINS:=test trace-ui
 
@@ -60,17 +71,6 @@ trace-ui_OBJS:= \
     gen/ui/imageWidget.o \
 	gen/ui/imageWidget.moc.o \
 	gen/trace-ui.o
-
-# Compile config
-CXX:= g++
-MOC:= moc-qt4
-CXXFLAGS:= -Wall -g -O0
-INCLUDES:= -I. \
-	-I/usr/include/qt4/QtCore \
-	-I/usr/include/qt4/QtGui \
-	-I/usr/include/qt4 
-LDFLAGS:= $(CXXFLAGS)
-LIBS:= -lm -lQtGui -lQtCore -lpthread
 
 # Compilation of cpp objects
 CXX_OBJS:=$(patsubst %.cpp,$(GENDIR)/%.o,$(CXX_SRCS))
