@@ -27,7 +27,6 @@
 
 #include <vector>
 #include <memory>
-#include <tr1/memory>
 
 class Image;
 class ImageTransform;
@@ -57,13 +56,13 @@ public:
   /* Processes the given traced RayImage through the image pipeline.
    * Returned Image will have whatever resolution the pipeline produces
    * for the resolution of the given RayImage */
-  std::tr1::shared_ptr<Image> process(const RayImage& img);
+  std::auto_ptr<Image> process(const RayImage& img);
 
   /* Processes the given traced RayImage through the image pipeline.
    * If the result of the pipeline does not have the given width
    * and height, the resampler set with setResampler will be used
    * to resample to the desired resolution. */
-  std::tr1::shared_ptr<Image> process
+  std::auto_ptr<Image> process
       (const RayImage& img, unsigned width, unsigned height);
 };
 

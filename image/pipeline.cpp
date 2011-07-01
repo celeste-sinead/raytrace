@@ -28,9 +28,17 @@
 #include "transform.h"
 #include "rayImage.h"
 #include "resample.h"
+#include "util/trace.h"
 
 using namespace std;
-using namespace std::tr1;
+
+static trc_ctl_t pipeTrace = {
+    TRC_INFO,
+    "IMAGE_PIPELINE",
+    TRC_STDOUT
+};
+#define TRACE(level, args...) \
+    trc_printf(&pipeTrace,level,1,args)
 
 ImagePipeline::~ImagePipeline() {
 	for (unsigned i=0; i<m_transforms.size(); ++i) {
@@ -50,8 +58,8 @@ void ImagePipeline::setResampler(auto_ptr<Resampler> resampler) {
 	m_resampler = resampler;
 }
 
-shared_ptr<Image> ImagePipeline::process(const RayImage &img) {
-	shared_ptr<Image> ret (new Image());
+auto_ptr<Image> ImagePipeline::process(const RayImage &img) {
+	auto_ptr<Image> ret (new Image());
 	ret->fromRay(img);
 
 	for (unsigned i=0; i < m_transforms.size(); ++i) {
@@ -61,10 +69,10 @@ shared_ptr<Image> ImagePipeline::process(const RayImage &img) {
 	return ret;
 }
 
-shared_ptr<Image> ImagePipeline::process
+auto_ptr<Image> ImagePipeline::process
 		(const RayImage& img, unsigned width, unsigned height) 
 {
-	shared_ptr<Image> ret = process(img);
+	auto_ptr<Image> ret = process(img);
 
 	if (!m_resampler.get()) {
 		// No resampler set, can't resize.

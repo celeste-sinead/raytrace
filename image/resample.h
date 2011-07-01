@@ -35,7 +35,7 @@ protected:
   unsigned m_xPix;
   unsigned m_yPix;
 
-  Resampler(unsigned width, unsigned height):
+  Resampler(unsigned width=0, unsigned height=0):
     m_xPix(width), m_yPix(height)
     { /* n/a */ }
 
@@ -51,7 +51,7 @@ public:
  * particularly pretty */
 class NearestNeighbor: public Resampler {
 public:
-  NearestNeighbor(unsigned width, unsigned height) :
+  NearestNeighbor(unsigned width=0, unsigned height=0) :
     Resampler(width, height)
     { /* n/a */ }
 
@@ -66,7 +66,7 @@ private:
       int dstI, int dstJ);
 
 public:
-  BilinearInterpolator(unsigned width, unsigned height) :
+  BilinearInterpolator(unsigned width=0, unsigned height=0) :
     Resampler(width, height)
     { /* n/a */ }
 

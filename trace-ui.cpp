@@ -21,9 +21,11 @@
  *****************************************************************************/
 
 #include <QtGui>
+#include <memory>
 
 #include "image/colour.h"
 #include "image/image.h"
+#include "image/pipeline.h"
 #include "image/rayImage.h"
 #include "image/resample.h"
 #include "trace/lighting.h"
@@ -31,6 +33,8 @@
 #include "trace/view.h"
 #include "trace/world.h"
 #include "ui/imageWidget.h"
+
+using namespace std;
 
 void qtTest(QApplication &app);
 
@@ -40,9 +44,6 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
-    const int w = 900;
-    const int h = 600;
-
     World world;
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
@@ -85,33 +86,19 @@ void qtTest(QApplication &app) {
     view.m_xVec = RayVector(0,4.5,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage traced (w, h);
+    RayImage traced (90, 60);
 
     view.render(&traced, &world, 20);
 
-    Image img;
-    img.fromRay(traced);
+		ImagePipeline p;
+		p.push(auto_ptr<ImageTransform>(new LogHDRToDisplay(0.0, 0.5)));
+		p.setResampler(auto_ptr<Resampler>(new NearestNeighbor()));
 
-    //LinearHDRToDisplay hdrtd (0.0,1.0);
-		LogHDRToDisplay hdrtd (0.0, 3.0);
-    hdrtd.apply(img);
-
-		Image nni (img);
-		NearestNeighbor nn (690, 460);
-		nn.apply(nni);
-
-		Image bti (img);
-		BilinearInterpolator bt (690, 460);
-		bt.apply(bti);
-
-		ImageWidget *oiw = new ImageWidget(img);
-    ImageWidget *nniw = new ImageWidget(nni);
-		ImageWidget *btiw = new ImageWidget(bti);
+		ImageWidget *oiw = new ImageWidget(
+				*(p.process(traced, 900, 600).release()));
 
     QHBoxLayout *imgs = new QHBoxLayout();
 		imgs->addWidget(oiw);
-    //imgs->addWidget(nniw);
-		//imgs->addWidget(btiw);
 
     QWidget *topWidget = new QWidget();
     topWidget->setLayout(imgs);
