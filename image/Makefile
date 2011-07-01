@@ -27,6 +27,7 @@ IMAGE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 IMAGE_CXX_SRCS:= \
                  colour.cpp \
                  image.cpp \
+								 pipeline.cpp \
                  rayImage.cpp \
 								 resample.cpp
 

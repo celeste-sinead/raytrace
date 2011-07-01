@@ -28,36 +28,47 @@
 
 class Image;
 
-/* A simple nearest neighbor resampler.  Each resampled pixel takes on
- * the value of the nearest source pixel.  This is very fast, but not
- * particularly pretty */
-class NearestNeighbor: public ImageTransform {
-private:
+/* Abstract base for all resampling transforms, which resample an
+ * image to a new resolution */
+class Resampler: public ImageTransform {
+protected:
   unsigned m_xPix;
   unsigned m_yPix;
 
+  Resampler(unsigned width, unsigned height):
+    m_xPix(width), m_yPix(height)
+    { /* n/a */ }
+
+public:
+  void setResolution(unsigned width, unsigned height) {
+    m_xPix = width;
+    m_yPix = height;
+  }
+};
+
+/* A simple nearest neighbor resampler.  Each resampled pixel takes on
+ * the value of the nearest source pixel.  This is very fast, but not
+ * particularly pretty */
+class NearestNeighbor: public Resampler {
 public:
   NearestNeighbor(unsigned width, unsigned height) :
-    m_xPix(width), m_yPix(height) 
-    { /* nothing to do */ }
+    Resampler(width, height)
+    { /* n/a */ }
 
   virtual Image& apply(Image &img);
 };
 
 /* A bilinear transform resampler.  Each resampled pixel is the 
  * average of the four nearest source pixels, weighted by distance */
-class BilinearInterpolator: public ImageTransform {
+class BilinearInterpolator: public Resampler {
 private:
-  unsigned m_xPix;
-  unsigned m_yPix;
-
   void doBilinearSample(Image &src, Image &dst, double srcI, double srcJ, 
       int dstI, int dstJ);
 
 public:
   BilinearInterpolator(unsigned width, unsigned height) :
-    m_xPix(width), m_yPix(height) 
-    { /* nothing to do */ }
+    Resampler(width, height)
+    { /* n/a */ }
 
   virtual Image& apply(Image &img);
 };

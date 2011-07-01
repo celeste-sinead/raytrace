@@ -1,8 +1,10 @@
 /******************************************************************************
- * transform.h
+ * imagePipeline.cpp
  * Copyright 2011 Iain Peet
  *
- * Defines an abstract class for all operations which transform an image.
+ * The ImagePipeline class composes all of the image processing operations 
+ * required to transform a traced RayImage into an image suitable for
+ * display.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -20,18 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#include "pipeline.h"
 
-class Image;
+#include "image.h"
+#include "transform.h"
 
-class ImageTransform {
-public:
-    virtual ~ImageTransform() {}
-
-    /* Applies this transform to the given image.
-     * @return the given image, transformed. */
-    virtual Image& apply(Image& img) = 0;
-};
-
-#endif //TRAMSFORM_H_
