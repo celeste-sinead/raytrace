@@ -29,6 +29,7 @@ TRACE_CXX_SRCS:= \
                  lighting.cpp \
                  ray.cpp \
                  rayObject.cpp \
+								 render.cpp \
                  view.cpp \
                  world.cpp
 

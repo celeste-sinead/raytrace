@@ -1,9 +1,9 @@
 /******************************************************************************
- * sceneParser.cpp
+ * render.h
  * Copyright 2011 Iain Peet
  *
- * Parses a json scene definition file, providing functions for generating 
- * World, View, and ImagePipeline objects from file.
+ * A Render is a composite class containing all of the elements required to
+ * render a scene.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -21,13 +21,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#include "sceneParser.h"
+#ifndef RENDER_H_
+#define RENDER_H_
 
-#include <json/reader.h>
+#include <tr1/memory>
 
-void jsonFoo() {
-	Json::Value root;   // will contains the root value after parsing.
-	Json::Reader reader;
-	bool parsingSuccessful = reader.parse("foo.json" , root );	
-}
+class World;
+class View;
+class ImagePipeline;
 
+/* Encapsulates a raytrace render.  
+ * Currently, this is just a container - meat comes later */
+class Render {
+public:
+  std::tr1::shared_ptr<World> m_world;
+  std::tr1::shared_ptr<View>  m_view;
+  std::tr1::shared_ptr<ImagePipeline> m_pipeline;
+
+public:
+  Render() : m_world(), m_view(), m_pipeline()
+    { /* n/a */ }
+
+};
+
+#endif //RENDER_H_

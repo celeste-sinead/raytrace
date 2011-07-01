@@ -25,7 +25,7 @@ FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Local source files that should be exported to build
 FILE_CXX_SRCS:= \
-                 sceneParser.cpp 
+                 reader.cpp 
 
 # Prepend the current directory name
 FILE_CXX_SRCS:= $(patsubst %,$(FILE_DIR)%,$(FILE_CXX_SRCS)) 

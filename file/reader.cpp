@@ -1,5 +1,5 @@
 /******************************************************************************
- * sceneParser.h
+ * reader.cpp
  * Copyright 2011 Iain Peet
  *
  * Parses a json scene definition file, providing functions for generating 
@@ -21,11 +21,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef SCENE_PARSER_H_
-#define SCENE_PARSER_H_
+#include "reader.h"
 
-class SceneParser {
+#include <json/reader.h>
 
-};
+bool SceneReader::parse() {
+	if (!m_reader.parse(m_path, m_root)) {
+		m_errStream << "Failed to parse JSON:\n";
+		m_errStream << m_reader.getFormattedErrorMessages();
+		return false;
+	}
 
-#endif //SCENE_PARSER_H_
+	/* Check that required world and view objects exist */
+	if (!m_root.isMember("world")) {
+		m_errStream << "Missing required 'world' member";
+		return false;
+	}
+	if (!m_root.isMember("view")) {
+		m_errStream << "Missing required 'view' member";
+		return false;
+	}
+}
+
