@@ -21,12 +21,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#include "reader.h"
-
+#include <iostream>
+#include <fstream>
 #include <json/reader.h>
 
+#include "reader.h"
+
+using namespace std;
+
 bool SceneReader::parse() {
-	if (!m_reader.parse(m_path, m_root)) {
+	ifstream f (m_path, ios_base::in);
+	if (f.fail()) {
+		m_errStream << "Failed to open file";
+		return false;
+	}
+
+	if (!m_reader.parse(f, m_root)) {
 		m_errStream << "Failed to parse JSON:\n";
 		m_errStream << m_reader.getFormattedErrorMessages();
 		return false;
@@ -41,5 +51,7 @@ bool SceneReader::parse() {
 		m_errStream << "Missing required 'view' member";
 		return false;
 	}
+
+	return true;
 }
 

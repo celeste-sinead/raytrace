@@ -32,7 +32,7 @@
 
 class SceneReader {
 private:
-  std::string  m_path;
+  const char*  m_path;
   Json::Value  m_root;
   Json::Reader m_reader;
 
@@ -49,7 +49,7 @@ private:
   SceneReader& operator=(const SceneReader& other);
 
 public:
-  SceneReader(const std::string &path) :
+  SceneReader(const char* path) :
     m_path(path), 
     m_root(), 
     m_reader(), 
@@ -68,7 +68,7 @@ public:
   Render& getRender();
 
   /* Get a string recording all errors that have occurred */
-  std::string getErrors() const;
+  std::string getErrors() const { return m_errStream.str(); }
 };
 
 #endif //SCENE_PARSER_H_

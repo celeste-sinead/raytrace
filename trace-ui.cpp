@@ -22,7 +22,9 @@
 
 #include <QtGui>
 #include <memory>
+#include <iostream>
 
+#include "file/reader.h"
 #include "image/colour.h"
 #include "image/image.h"
 #include "image/pipeline.h"
@@ -44,6 +46,13 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
+		SceneReader r ("examples/scene1.json");
+		if (!r.parse()) {
+			cerr << "Failed to parse scene" << endl;
+			cerr << r.getErrors() << endl;
+			return;
+		}
+
     World world;
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
