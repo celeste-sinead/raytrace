@@ -26,4 +26,57 @@
 
 #include "image.h"
 #include "transform.h"
+#include "rayImage.h"
+#include "resample.h"
+
+using namespace std;
+using namespace std::tr1;
+
+ImagePipeline::~ImagePipeline() {
+	for (unsigned i=0; i<m_transforms.size(); ++i) {
+		delete m_transforms[i];
+	}
+}
+
+void ImagePipeline::push(auto_ptr<ImageTransform> transform) {
+	/* The purpose of the auto_ptr is to hint strongly to the client
+	 * that the transform is to be dynamically allocated, with ownership
+	 * passed to the pipeline.  Once ownership is taken, the auto_ptr
+	 * is stripped, since it won't play nice with vectors */
+	m_transforms.push_back(transform.release());
+}
+
+void ImagePipeline::setResampler(auto_ptr<Resampler> resampler) {
+	m_resampler = resampler;
+}
+
+shared_ptr<Image> ImagePipeline::process(const RayImage &img) {
+	shared_ptr<Image> ret (new Image());
+	ret->fromRay(img);
+
+	for (unsigned i=0; i < m_transforms.size(); ++i) {
+		m_transforms[i]->apply(*ret);
+	}
+
+	return ret;
+}
+
+shared_ptr<Image> ImagePipeline::process
+		(const RayImage& img, unsigned width, unsigned height) 
+{
+	shared_ptr<Image> ret = process(img);
+
+	if (!m_resampler.get()) {
+		// No resampler set, can't resize.
+		return ret;
+	}
+
+	if ((width != ret->width()) || (height != ret->height())) {
+		// Need to resample the output image
+		m_resampler->setResolution(width, height);
+		m_resampler->apply(*ret);
+	}
+
+	return ret;
+}
 

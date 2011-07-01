@@ -40,28 +40,30 @@ private:
   std::vector<ImageTransform*> m_transforms;
 
   // Used to resize the final image, if requested.
-  Resampler *m_resampler;
+  std::auto_ptr<Resampler>     m_resampler;
 
 public:
-  ImagePipeline();
+  ImagePipeline() :
+    m_transforms(), m_resampler(0)
+    { /* n/a */ }
   ~ImagePipeline();
 
   // Adds another transform to the pipeline
-  void push(std::auto_ptr<ImageTransform*> transform);
+  void push(std::auto_ptr<ImageTransform> transform);
 
   // Set the resampler used to resize the final image, if requested.
-  void setResampler(std::auto_ptr<ImageTransform*> resampler);
+  void setResampler(std::auto_ptr<Resampler> resampler);
 
   /* Processes the given traced RayImage through the image pipeline.
    * Returned Image will have whatever resolution the pipeline produces
    * for the resolution of the given RayImage */
-  std::tr1::shared_ptr<Image*> process(const RayImage& img);
+  std::tr1::shared_ptr<Image> process(const RayImage& img);
 
   /* Processes the given traced RayImage through the image pipeline.
    * If the result of the pipeline does not have the given width
    * and height, the resampler set with setResampler will be used
    * to resample to the desired resolution. */
-  std::tr1::shared_ptr<Image*> process
+  std::tr1::shared_ptr<Image> process
       (const RayImage& img, unsigned width, unsigned height);
 };
 
