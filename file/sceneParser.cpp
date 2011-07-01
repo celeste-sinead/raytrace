@@ -23,3 +23,11 @@
 
 #include "sceneParser.h"
 
+#include <json/reader.h>
+
+void jsonFoo() {
+	Json::Value root;   // will contains the root value after parsing.
+	Json::Reader reader;
+	bool parsingSuccessful = reader.parse("foo.json" , root );	
+}
+

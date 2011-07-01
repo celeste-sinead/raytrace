@@ -1,7 +1,22 @@
-TODO(ipeet): Keep this up to date.  (Who am I kidding?)
+This is a simple raytracer.  
 
-This is currently a pretty simple project.  It currently depends
-on qt4 to do the actual display (and I may build a real GUI sometime),
-so you will need libqt4-dev to build.
+The primary purpose for this project is to be written for the sake of writing.
+The intent is to implement all logic directly related to tracing and 
+postprocessing from the ground up.
 
-Other than that, it should be a simple matter of running make.
+
+BUILDING
+
+Beyond the standdard gcc toolset, which should be a given, you will require
+the following to build and run this project:
+
+	libqt4-dev
+	qt4-dev-tools
+	libjsoncpp
+
+libjsoncpp source can be found in ./lib; you will need to build it, install
+its includes in the include path, and install the .so it produces somewhere
+in the linker path.
+
+libjsoncpp should also be available at http://jsoncpp.sourceforge.net/
+

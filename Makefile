@@ -50,7 +50,7 @@ INCLUDES:= -I. \
 	-I/usr/include/qt4/QtGui \
 	-I/usr/include/qt4 
 LDFLAGS:= $(CXXFLAGS)
-LIBS:= -lm -lQtGui -lQtCore -lpthread
+LIBS:= -lm -lQtGui -lQtCore -lpthread -ljsoncpp
 
 # List of bins to link
 BINS:=test trace-ui
