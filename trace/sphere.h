@@ -1,14 +1,8 @@
 /******************************************************************************
- * rayObject.h
- * Copyright 2010 Iain Peet
+ * sphere.h
+ * Copyright 2011 Iain Peet
  *
- * Defines the bases of entities which 'exist' in the raytraced universe. 
- * Currently, these objects consist of RayObjects and LightSources
- *
- * RayObjects are entities that can intersect and colour Rays.
- *
- * LightSources cannot directly interact with rays, but make some contribution
- * to the intensity of light at any given point in the world.
+ * Provides spherical objects.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -26,41 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef ray_object_h_
-#define ray_object_h_
+#ifndef SPHERE_H_
+#define SPHERE_H_
 
+#include "trace/object.h"
+#include "trace/geom.h"
 #include "image/colour.h"
 
-#include "geom.h"
-
 class Ray;
-class World;
-
-/** Abstract base for any objects which may be intersected by a ray. */
-class RayObject {
-public:
-    /** Determine the distance from the ray's origin to the
-     *  (nearest) intersection of the ray with this object 
-     *  @param inbound The ray whose interesect distance is reauired. 
-     *  @return        The intersect distance, if the ray intersects.
-     *                 -1.0 If the ray does not intersect. */
-    virtual double intersectDist(Ray *inbound) = 0;
-
-   
-    /* Determine the colour of a given ray.
-     * @param inbound The ray to colour.
-     * @param world   The world in which this object exists.  
-     * @return        true if inbound intersects and has been coloured.
-     *                false if inbound does not actually intersect */
-    virtual bool colour(Ray *inbound, World *world) = 0;
-};
-
 
 /** Object providing methods for computing ray/sphere intersections.
  *  In addition to being useful for spherical objects, these methods
  *  are useful for coarse intersection checks for more complex
  *  objects which can be circumscribed by a sphere */
-class BaseSphere : public RayObject {
+class BaseSphere : public VisibleObject {
 protected:
     //! Origin of this object. Center of a circumscribing sphere. 
     Coord     m_origin;
@@ -105,5 +78,4 @@ public:
     virtual bool colour(Ray* inbound, World* world);
 };
 
-#endif // ray_object_h_
-
+#endif //SPHERE_H_

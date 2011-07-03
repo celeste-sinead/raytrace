@@ -30,14 +30,15 @@
 class LightSource;
 class Ray;
 class RayObject;
+class VisibleObject;
 
 /** A simple list of objects which may appear in a raytraced image.
  *  ( Could just use a std::vector right now, but I plan to add 
  *    extra features to speed up searches, so it's its own class */
 class World {
 private:
-    std::vector<RayObject*>   m_objects;
-    std::vector<LightSource*> m_lights;
+    std::vector<VisibleObject*> m_visibles;
+    std::vector<LightSource*>   m_lights;
     
 public:
     //! Colour returned when a ray trace fails
@@ -59,26 +60,16 @@ public:
      *             Intersect distance will be set if an intersect is found.
      *  @return    The first object intersecting the ray. 
      *             null if no objects intersect. */
-    RayObject * intersect(Ray *ray);
-   
-    /** RayObject list accessors / modifiers */
-    int size()
-        { return m_objects.size(); }
-    void addObject(RayObject *obj)
-        { m_objects.push_back(obj); }
-    RayObject * remove(int index);
-    RayObject *& at(int index)
-        { return m_objects[index]; }
-    RayObject *& operator[](int index)
-        { return at(index); }
+    VisibleObject * intersect(Ray *ray);
+ 
+    /** Add an object to the world. 
+     *  @return true if successful, false if not */
+    bool addObject(RayObject *obj);
 
-    /** LightSource list accessors / modifiers */
-    int numLights() 
-        { return m_lights.size(); }
-    void addLight(LightSource *light) 
-        { m_lights.push_back(light); }
-    const std::vector<LightSource*> & lights()
-        { return m_lights; }
+    /* Access lights.
+     * TODO: factor external uses into World */
+    const std::vector<LightSource*>& lights() const 
+        {return m_lights;}
 };
 
 #endif //world_h_

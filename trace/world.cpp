@@ -28,8 +28,9 @@
 
 #include "image/colour.h"
 #include "util/trace.h"
+#include "lighting.h"
+#include "object.h"
 #include "ray.h"
-#include "rayObject.h"
 
 using std::vector;
 
@@ -41,35 +42,37 @@ static trc_ctl_t worldTrace = {
 #define TRACE(level, args...) \
    trc_printf(&worldTrace,level,1,args)
 
-//! Removes an object from the object list
-RayObject* World::remove(int index)
-{
-    vector<RayObject*>::iterator elem = m_objects.begin();
-    elem += index;
-    RayObject * removed = 0;
-    if( elem != m_objects.end() ) {
-         removed = *elem;
-         m_objects.erase(elem);
+//! Add an object
+bool World::addObject(RayObject *obj) {
+    VisibleObject *asVisible = dynamic_cast<VisibleObject*>(obj);
+    if (asVisible) {
+        m_visibles.push_back(asVisible);
     }
-    return removed;
+
+    LightSource *asLight = dynamic_cast<LightSource*>(obj);
+    if (asLight) {
+        m_lights.push_back(asLight);
+    }
+
+    return asVisible || asLight;
 }
 
 //! Trace a ray
 bool World::trace(Ray* ray)
 {
     ray->m_colour = m_defaultColour;
-    RayObject * closest = 0;
+    VisibleObject * closest = 0;
     double closestDist = 0.0;
    
     /* See if the ray hits any objects */
-    for(int i=0; i<size(); ++i) {
-        double curDist = at(i)->intersectDist(ray);
+    for(unsigned i=0; i < m_visibles.size(); ++i) {
+        double curDist = m_visibles.at(i)->intersectDist(ray);
         TRACE(TRC_DTL, "Object %d distance: %f\n", i, curDist);
 
         if(curDist >= 0.0) { // Actually intersects
             if( (!closest) || (curDist < closestDist) ) {
                 // First intersection, or smallest intersection yet
-                closest = at(i);
+                closest = m_visibles.at(i);
                 closestDist = curDist;
             }
         }
@@ -95,17 +98,17 @@ bool World::trace(Ray* ray)
 }
 
 //! Find the first object intersecting a ray
-RayObject * World::intersect(Ray * ray)
+VisibleObject * World::intersect(Ray * ray)
 {
-    RayObject * closest = 0;
+    VisibleObject * closest = 0;
     double closestDist = -1.0;
 
     /* Look for objects for intersections */
-    for(int i=0; i<size(); ++i) {
-        double curDist = at(i)->intersectDist(ray);
+    for(unsigned i=0; i < m_visibles.size(); ++i) {
+        double curDist = m_visibles.at(i)->intersectDist(ray);
         if(curDist >= 0.0) {
             if( (!closest) || (curDist < closestDist) ) {
-                closest = at(i);
+                closest = m_visibles.at(i);
                 closestDist = curDist;
             }
         }

@@ -27,9 +27,10 @@ TRACE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 TRACE_CXX_SRCS:= \
                  geom.cpp \
                  lighting.cpp \
+                 object.cpp \
                  ray.cpp \
-                 rayObject.cpp \
-								 render.cpp \
+                 render.cpp \
+                 sphere.cpp \
                  view.cpp \
                  world.cpp
 

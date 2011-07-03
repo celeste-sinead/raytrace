@@ -25,7 +25,8 @@
 
 #include "image/image.h"
 #include "image/rayImage.h"
-#include "trace/rayObject.h"
+#include "trace/object.h"
+#include "trace/sphere.h"
 #include "trace/view.h"
 #include "trace/world.h"
 #include "util/unit.h"

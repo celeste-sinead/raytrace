@@ -25,8 +25,9 @@
 
 #include "image/colour.h"
 
-#include "geom.h"
-#include "rayObject.h"
+#include "trace/geom.h"
+#include "trace/object.h"
+#include "trace/sphere.h"
 
 class Ray;
 class World;
@@ -49,7 +50,7 @@ public:
 };
 
 /** Abstract base for light sources. */
-class LightSource {
+class LightSource: public virtual RayObject {
 public:
     /** Determine this light source's contribution to lighting at a 
      *  given point in the world.
@@ -59,7 +60,7 @@ public:
 };
 
 /** A simple point source of light. */
-class PointSource : public LightSource{
+class PointSource : public LightSource {
 protected:
     RayColour m_intensity;
     RayVector m_origin;
@@ -81,7 +82,6 @@ public:
         BaseSphere(origin,radius)
         {}
 
-//    virtual Lighting lightingAt(Coord* point, World* world);
     virtual bool colour(Ray* inbound, World* world);
 };
 

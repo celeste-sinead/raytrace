@@ -25,7 +25,7 @@
 #include "lighting.h"
 #include "ray.h"
 #include "world.h"
-#include "rayObject.h"
+#include "object.h"
 
 Lighting PointSource::lightingAt(Coord * point, World *world )
 {

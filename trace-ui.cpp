@@ -31,7 +31,7 @@
 #include "image/rayImage.h"
 #include "image/resample.h"
 #include "trace/lighting.h"
-#include "trace/rayObject.h"
+#include "trace/object.h"
 #include "trace/view.h"
 #include "trace/world.h"
 #include "ui/imageWidget.h"
@@ -83,11 +83,9 @@ void qtTest(QApplication &app) {
     world.addObject(&sph5);
 
     SphereSource light1 (RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0));
-    world.addLight(&light1);
     world.addObject(&light1);
 
     SphereSource light2 (RayVector(5,-1,-1), 0.125, RayColour(100,100,100));
-    world.addLight(&light2);
     world.addObject(&light2);
     
     ParallelView view;

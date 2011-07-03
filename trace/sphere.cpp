@@ -1,9 +1,8 @@
 /******************************************************************************
- * rayObject.cpp
- * Copyright 2010 Iain Peet
+ * sphere.cpp
+ * Copyright 2011 Iain Peet
  *
- * Implements the base of some object in the ray graphics universe which
- * affects rays in some way.
+ * Provides spherical objects.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -21,23 +20,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#include <math.h>
+#include <cmath>
 
-#include "rayObject.h"
+#include "sphere.h"
 
 #include "util/trace.h"
 #include "util/unit.h"
 #include "lighting.h"
+#include "object.h"
 #include "ray.h"
 #include "world.h"
 
-static trc_ctl_t rayObjectTrc = {
+static trc_ctl_t sphereTrc = {
     TRC_DFL_LVL,
-    "RAY-OBJ",
+    "SPHERE",
     TRC_DFL_PRINT
 };
 #define TRACE(level, args...) \
-    trc_printf(&rayObjectTrc,(level),1,args)
+    trc_printf(&sphereTrc,(level),1,args)
 
 //! Checks if a ray intersects this object.  
 double BaseSphere::intersectDist(Ray *inbound)
@@ -169,4 +169,3 @@ START_TEST_FN(sphere_intersect,"Sphere Intersect Detection")
     TEST_CONDITION( s.intersectDist(&r) < 0, "Near miss check\n");
     
 END_TEST_FN
-

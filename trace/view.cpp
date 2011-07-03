@@ -31,7 +31,7 @@
 #include "util/trace.h"
 #include "geom.h"
 #include "ray.h"
-#include "rayObject.h"
+#include "object.h"
 #include "world.h"
 
 using std::vector;
