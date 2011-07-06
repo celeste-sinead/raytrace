@@ -60,8 +60,8 @@ python scons.py platform=$JSONCPP_PLATFORM
 echo -e "\nInstalling jsoncpp..."
 sudo cp -r include/json /usr/local/include
 # This assumes only one output platform!  (Clean build, should hold.) 
-sudo cp libs/*/*.a /usr/lib/jsoncpp.a
-sudo cp libs/*/*.so /usr/lib/jsoncpp.so
+sudo cp libs/*/*.a /usr/lib/libjsoncpp.a
+sudo cp libs/*/*.so /usr/lib/libjsoncpp.so
 
 echo -e "\nCleaning up after jsoncpp install."
 cd -
