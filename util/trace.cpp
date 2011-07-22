@@ -24,8 +24,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <gtest/gtest.h>
+
 #include "trace.h"
-#include "unit.h"
 
 /** For tracing trace ;) */
 #define TRACE(args...)   printf(args)
@@ -141,23 +142,23 @@ void trc_global_set(enum trc_global_type type, int level) {
  * really practical to try to make sure output actually got output (that's up
  * to a human being to check) */
 
-START_TEST_FN(check_stdprint,"Check Trace to stdout")
+TEST(TraceTest, TraceStdout) {
     trc_stdprint("Test trace message on stdout.\n");
-    TEST_CONDITION(1,"Printed without crashing\n");
-END_TEST_FN
+		/* Success! didn't crash */
+}
 
-START_TEST_FN(check_errprint,"Check Trace to stderr")
+TEST(TraceTest, TraceStderr) {
     trc_errprint("Test trace message on stderr.\n");
-    TEST_CONDITION(1,"Printed without crashing\n");
-END_TEST_FN
+		/* Success! didn't crash */
+}
 
-START_TEST_FN(check_def_fprint,"Check Trace to default file")
+TEST(TraceTest, DefaultFprint) {
     trc_def_fprint("Test race message to default file.\n");
     trc_def_fprint("Another message in default file.\n");
-    TEST_CONDITION(1,"Printed without crashing\n");
-END_TEST_FN
+		/* Success! didn't crash */
+}
 
-START_TEST_FN(check_trc_print,"Check Trace function")
+TEST(TraceTest, TracePrint) {
     // Check using default control block
     trc_printf(&trc_default,1,0,"Printed with default handler\n");
     trc_printf(0,1,0,"Printed with (implicit) default handler\n");
@@ -175,11 +176,9 @@ START_TEST_FN(check_trc_print,"Check Trace function")
     trc_printf(&ctl,1,1,"Args: %s %d %f\n","foo",42,3.14159);
     ctl.write_fn = TRC_DFL_FILE;
     trc_printf(&ctl,1,1,"trc_printf to file (0x%06x)\n",0xfeed);
-    
-    TEST_CONDITION(1,"Printed without crashing\n");
-END_TEST_FN
+} 
 
-START_TEST_FN(check_trc_set,"Check Trace Runtime Configuration\n")
+TEST(TraceTest, ChangeConfig) {
     trc_printf(0,2,0,"Normal print.\n");
     trc_printf(0,TRC_DFL_LVL+1,0,"This should NOT print\n");
     trc_global_set(TRC_LIMIT_LEVEL,1);
@@ -188,6 +187,5 @@ START_TEST_FN(check_trc_set,"Check Trace Runtime Configuration\n")
     trc_global_set(TRC_OVERRIDE_LEVEL,5);
     trc_printf(0,1,0,"Overrode level.\n");
     trc_printf(0,5,0,"This should print.\n");
-    
-    TEST_CONDITION(1,"Tested without crashing\n");
-END_TEST_FN
+}
+

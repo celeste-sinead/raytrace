@@ -28,7 +28,6 @@
 #include "image.h"
 
 #include "util/trace.h"
-#include "util/unit.h"
 #include "rayImage.h"
 #include "colour.h"
 

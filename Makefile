@@ -59,13 +59,14 @@ LIBS:= -lm -lQtGui -lQtCore -lpthread -ljsoncpp
 BINS:=test trace-ui
 
 COMMON_OBJS:= \
+	$(GENDIR)/googletest/googletest/src/gtest-all.o \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(IMAGE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(TRACE_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(UTIL_CXX_SRCS)) \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(FILE_CXX_SRCS)) 
 
 test_OBJS:= \
-	$(GENDIR)/googletest/googletest/src/gtest-all.o \
+	$(COMMON_OBJS) \
 	gen/test.o
 
 trace-ui_OBJS:= \

@@ -21,11 +21,11 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <gtest/gtest.h>
 
 #include "sphere.h"
 
 #include "util/trace.h"
-#include "util/unit.h"
 #include "lighting.h"
 #include "object.h"
 #include "ray.h"
@@ -60,7 +60,7 @@ double BaseSphere::intersectDist(Ray *inbound)
 
     // Discriminant < 0 indicates no intersection
     if(discr < 0) {
-        TRACE(TRC_DTL,"Ray misses sphere.");
+        TRACE(TRC_DTL,"Ray misses sphere.\n");
         return -1.0;
     }
 
@@ -127,7 +127,7 @@ bool Sphere::colour(Ray* inbound, World* world) {
 }
 
 //! Check intersect detection for sphere.
-START_TEST_FN(sphere_intersect,"Sphere Intersect Detection")
+TEST(SphereTest, SphereIntersection) {
     Sphere s ( Coord(0.0,0.0,0.0), 1.0, RayColour(1.0,1.0,1.0));
     Ray r (1 /* no reflection */);
    
@@ -137,35 +137,35 @@ START_TEST_FN(sphere_intersect,"Sphere Intersect Detection")
     RayVector direct_dir (-1.0, 0.0, 0.0);
     r.m_endpoint = endpt;
     r.m_dir = direct_dir;
-    TEST_CONDITION( s.intersectDist(&r) >= 0, "Direct intersection check\n");
+    ASSERT_GE( s.intersectDist(&r), 0) << "Direct intersection check";
     
     /* Test a non-centred intersection */
     RayVector indirect_dir (-2.0, 0.5, 0.0);
     indirect_dir.unitify();
     r.m_dir = indirect_dir;
-    TEST_CONDITION( s.intersectDist(&r) >= 0, "Indirect intersection check\n");
+    ASSERT_GE( s.intersectDist(&r),  0) << "Indirect intersection check";
     
     /* Test an edge intersection */
     // Some geometry gives us this vector, which just touches the edge.
     RayVector edge_dir (-1.5, sqrt(3)/2.0, 0.0);
     edge_dir.unitify();
     r.m_dir = edge_dir;
-    TEST_CONDITION( s.intersectDist(&r) >= 0, "Edge intersection check\n");
+    ASSERT_GE( s.intersectDist(&r), 0) << "Edge intersection check";
     
     /* Test the complete wrong direction */
     RayVector opposite_dir (1.0, 0.0, 0.0);
     r.m_dir = opposite_dir;
-    TEST_CONDITION( s.intersectDist(&r) < 0, "Opposite direction miss check\n");
+    ASSERT_LT( s.intersectDist(&r), 0) << "Opposite direction miss check";
     
     /* Normal to direction of sphere */
     RayVector normal_dir (0.0, 1.0, 0.0);
     r.m_dir = normal_dir;
-    TEST_CONDITION( s.intersectDist(&r) < 0, "Normal miss check\n");
+    ASSERT_LT( s.intersectDist(&r), 0) << "Normal miss check";
     
     /* Near miss */
     RayVector near_dir (-1.5, sqrt(3)/2.0+0.01, 0.0);
     near_dir.unitify();
     r.m_dir = near_dir;
-    TEST_CONDITION( s.intersectDist(&r) < 0, "Near miss check\n");
-    
-END_TEST_FN
+    ASSERT_LT( s.intersectDist(&r), 0) << "Near miss check";
+}
+

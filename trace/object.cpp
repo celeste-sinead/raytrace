@@ -27,7 +27,6 @@
 #include "object.h"
 
 #include "util/trace.h"
-#include "util/unit.h"
 #include "lighting.h"
 #include "ray.h"
 #include "world.h"

@@ -22,9 +22,9 @@
 
 #include <cstdio>
 #include <cmath>
+#include <gtest/gtest.h>
 
 #include "geom.h"
-#include "util/unit.h"
 #include "util/trace.h"
 
 static trc_ctl_t geomTrace = {
@@ -173,20 +173,19 @@ char* RayVector::snprint(char* buf, int maxLen) const
 }
 
 
-START_TEST_FN(vector_geom,"Vector Algebra")
+TEST(VectoreGeom, VectorAlgebra) {
     RayVector vec1 (1.0,0.0,0.0);
     RayVector vec2 (0.0,1.0,0.0);
     RayVector cross = vec1.cross(vec2);
-    TEST_CONDITION( cross == RayVector(0.0,0.0,1.0), "i x j = k\n" );
+    ASSERT_EQ(RayVector(0.0,0.0,1.0), cross) <<  "i x j != k";
     
     cross = vec2.cross(vec1);
-    TEST_CONDITION( cross == RayVector(0.0,0.0,-1.0), "j x i = -k\n" );
-    
+    ASSERT_EQ(RayVector(0.0,0.0,-1.0), cross) << "j x i != -k";
+
     vec1.set(1,1,1);
     vec2.set(-1,1,1);
     cross = vec1.cross(vec2);
-    TEST_CONDITION( (fabs(vec1.dot(cross)) < 1E-3)
-        && ( fabs(vec2.dot(cross)) < 1E-3 ),
-	"check ( s x p ) . s = 0\n\n");
-    
-END_TEST_FN
+    ASSERT_TRUE( (fabs(vec1.dot(cross)) < 1E-3)
+        && ( fabs(vec2.dot(cross)) < 1E-3 )) <<
+				"check ( s x p ) . s = 0";
+} 

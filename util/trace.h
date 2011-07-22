@@ -71,7 +71,7 @@ inline void trc_errprint(const char* msg) {
 // Write to the file TRC_DFL_FILENAME in CWD:
 void trc_def_fprint(const char* msg);
 #define TRC_DFL_FILE     trc_def_fprint
-#define TRC_DFL_FILENAME "trace"
+#define TRC_DFL_FILENAME "trace.txt"
 
 // The default output function:
 #define TRC_DFL_PRINT TRC_STDOUT
