@@ -23,56 +23,11 @@
 #include <cstdio>
 #include <cstring>
 
-#include "image/image.h"
-#include "image/rayImage.h"
-#include "trace/object.h"
-#include "trace/sphere.h"
-#include "trace/view.h"
-#include "trace/world.h"
-#include "util/unit.h"
-#include "ui/asciiDisplay.h"
-
-void singleSphere();
+#include <gtest/gtest.h>
 
 int main(int argc, char *argv[]) {
-    /** Run unit tests */
-    START_TEST_RUNNER;
-    
-    EXEC_TEST(sphere_intersect);
-    EXEC_TEST(vector_geom);
-    
-    END_TEST_RUNNER;
-    
-    printf("Ascii Render:\n"); 
-    singleSphere();
-
-    printf("Done!\n");
-    return 0;   
-}
-
-void singleSphere() {
-    const int w = 36;
-    const int h = 16;
-
-    World world;
-    world.m_defaultColour.set(1.0,0,0);  // bright red
-    world.m_globalDiffuse.set(0.01,0.01,0.01); // white
-    
-    Sphere sph ( Coord(0,0,0), 1.0, RayColour(100,100,100) );
-    world.addObject(&sph);
-    
-    ParallelView view;
-    view.m_origin = Coord(2,-1.5,1.5);
-    view.m_xVec = RayVector(0,3,0);
-    view.m_yVec = RayVector(0,0,-3);
-    
-    RayImage traced (w, h);
-    
-    view.render(&traced, &world);
-
-    Image display;
-    display.fromRay(traced);
-  
-    displayAscii(display, 0.5);
+  ::testing::InitGoogleTest(&argc, argv);
+  RUN_ALL_TESTS();
+  return 0;   
 }
 

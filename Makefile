@@ -25,6 +25,7 @@
 
 # List of subdir from which to obtain source lists
 SRCDIRS:= file \
+		 googletest \
 		 image\
 		 trace\
 		 ui \
@@ -48,7 +49,9 @@ CXXFLAGS:= -Wall -g -O0
 INCLUDES:= -I. \
 	-I/usr/include/qt4/QtCore \
 	-I/usr/include/qt4/QtGui \
-	-I/usr/include/qt4 
+	-I/usr/include/qt4 \
+	-Igoogletest/googletest \
+	-Igoogletest/googletest/include
 LDFLAGS:= $(CXXFLAGS)
 LIBS:= -lm -lQtGui -lQtCore -lpthread -ljsoncpp
 
@@ -62,13 +65,12 @@ COMMON_OBJS:= \
 	$(patsubst %.cpp,$(GENDIR)/%.o,$(FILE_CXX_SRCS)) 
 
 test_OBJS:= \
-	$(COMMON_OBJS) \
-    gen/ui/asciiDisplay.o \
+	$(GENDIR)/googletest/googletest/src/gtest-all.o \
 	gen/test.o
 
 trace-ui_OBJS:= \
 	$(COMMON_OBJS) \
-    gen/ui/imageWidget.o \
+	gen/ui/imageWidget.o \
 	gen/ui/imageWidget.moc.o \
 	gen/trace-ui.o
 
@@ -85,6 +87,13 @@ $(CXX_DEPS): $$(patsubst $(GENDIR)/%.d,%.cpp,$$@)
 	$(CXX) $(INCLUDES) -MM -MT $(<:%.cpp=$(GENDIR)/%.o) -MF $@ $<
 deps: $(CXX_DEPS)
 include $(CXX_DEPS)
+
+# Googletest uses a different cpp extension, so it needs its own bloody rules.
+# Won't worry about deps, don't expect this file to change.
+GTEST_OBJS:=$(patsubst %.cc,$(GENDIR)/%.o,$(GTEST_SRCS))
+$(GTEST_OBJS): $$(patsubst $(GENDIR)/%.o,%.cc,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $< -c -o $@
 
 # QT MOC generation
 QT_MOC_SRCS:=$(patsubst %.h,$(GENDIR)/%.moc.cpp,$(QT_HEADS))
@@ -114,6 +123,9 @@ tags: $(CXX_SRCS)
 
 all: $(BINS) tags
 
+runtests: test
+	./test
+
 clean:
 	rm -rf $(GENDIR)
 	rm -f $(BINS)
@@ -122,6 +134,9 @@ clean:
 debugp:
 	@echo "CXX_SRCS: $(CXX_SRCS)"
 	@echo "CXX_OBJS: $(CXX_OBJS)"
+	@echo "CXX_DEPS: $(CXX_DEPS)"
+	@echo "GTEST_SRCS: $(GTEST_SRCS)"
+	@echo "GTEST_OBJS: $(GTEST_OBJS)"
 	@echo "QT_HEADS: $(QT_HEADS)"
 	@echo "QT_MOC_SRCS: $(QT_MOC_SRCS)"
 	@echo "QT_MOC_OBJS: $(QT_MOC_OBJS)"
