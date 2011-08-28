@@ -43,9 +43,9 @@ static trc_ctl_t worldTrace = {
    trc_printf(&worldTrace,level,1,args)
 
 World::~World() {
-	for (unsigned i=0; i < m_objects.size(); ++i) {
-		delete m_objects[i];
-	}
+    for (unsigned i=0; i < m_objects.size(); ++i) {
+        delete m_objects[i];
+    }
 }
 
 //! Trace a ray

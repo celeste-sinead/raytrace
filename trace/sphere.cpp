@@ -106,9 +106,9 @@ bool Sphere::colour(Ray &inbound, World &world) {
     RayVector interNorm = -normal(intersect);
     for(unsigned i=0; i<world.objects().size(); ++i) {
         Lighting cur = world.objects().at(i)->lightingAt(intersect, world);
-
-		// Short-circuit if the object produces no light.
-		if (cur.m_intensity.magnitude() == 0.0) continue;
+ 
+        // Short-circuit if the object produces no light.
+        if (cur.m_intensity.magnitude() == 0.0) continue;
 
         double scale = cur.m_dir.dot(interNorm);
         if(scale<0.0) scale = 0.0;

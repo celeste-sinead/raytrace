@@ -48,53 +48,53 @@ int main(int argc, char *argv[]) {
 }
     
 void qtTest(QApplication &app) {
-		SceneReader r ("examples/scene1.json");
-		if (!r.parse()) {
-			cerr << "Failed to parse scene" << endl;
-			cerr << r.getErrors() << endl;
-			return;
-		}
+    SceneReader r ("examples/scene1.json");
+    if (!r.parse()) {
+        cerr << "Failed to parse scene" << endl;
+        cerr << r.getErrors() << endl;
+        return;
+    }
 
     World world;
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
     
     auto_ptr<RayObject> sph (
-			new Sphere( Coord(0,0,0), 1.0, 
-                 RayColour(0.1, 0.25, 1.0),
-                 RayColour(0.1,0.25,1.0)));
+        new Sphere( Coord(0,0,0), 1.0, 
+             RayColour(0.1, 0.25, 1.0),
+             RayColour(0.1,0.25,1.0)));
     world.addObject(sph);
 
     auto_ptr<RayObject> sph2 ( 
-			new Sphere( Coord(0.5,1.5,1.5), 1.5, 
-                  RayColour(1.0, 1.0, 0.1),
-                  RayColour(1.0, 1.0, 0.2)));
+        new Sphere( Coord(0.5,1.5,1.5), 1.5, 
+             RayColour(1.0, 1.0, 0.1),
+             RayColour(1.0, 1.0, 0.2)));
     world.addObject(sph2);
 
     auto_ptr<RayObject> sph3 (
-			new Sphere(Coord(0,-1.25, 0), 0.5, 
-                  RayColour(0.1, 1.0, 0.1), 
-                  RayColour(0.2, 1.0, 0.2)));
+        new Sphere(Coord(0,-1.25, 0), 0.5, 
+             RayColour(0.1, 1.0, 0.1), 
+             RayColour(0.2, 1.0, 0.2)));
     world.addObject(sph3);
 
     auto_ptr<RayObject> sph4 (
-			new Sphere( Coord(1.2,0.3,0.1), 0.75, 
-                 RayColour(1.0, 0.1, 0.1), 
-                 RayColour(1.0, 0.2, 0.2)));
+        new Sphere( Coord(1.2,0.3,0.1), 0.75, 
+             RayColour(1.0, 0.1, 0.1), 
+             RayColour(1.0, 0.2, 0.2)));
     world.addObject(sph4);
 
     auto_ptr<RayObject> sph5 (
-			new Sphere( Coord(-3.5,-2, 2), 3,
-                 RayColour(0, 0, 0.4),
-                 RayColour(1, 1, 1)));
+        new Sphere( Coord(-3.5,-2, 2), 3,
+             RayColour(0, 0, 0.4),
+             RayColour(1, 1, 1)));
     world.addObject(sph5);
 
     auto_ptr<RayObject> light1 (
-		new SphereSource(RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0)));
+        new SphereSource(RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0)));
     world.addObject(light1);
 
     auto_ptr<RayObject> light2 (
-		new SphereSource(RayVector(5,-1,-1), 0.125, RayColour(100,100,100)));
+        new SphereSource(RayVector(5,-1,-1), 0.125, RayColour(100,100,100)));
     world.addObject(light2);
     
     ParallelView view;
@@ -106,15 +106,15 @@ void qtTest(QApplication &app) {
 
     view.render(&traced, &world, 20);
 
-		ImagePipeline p;
-		p.push(auto_ptr<ImageTransform>(new LogHDRToDisplay(0.0, 0.5)));
-		p.setResampler(auto_ptr<Resampler>(new NearestNeighbor()));
+    ImagePipeline p;
+    p.push(auto_ptr<ImageTransform>(new LogHDRToDisplay(0.0, 0.2)));
+    p.setResampler(auto_ptr<Resampler>(new NearestNeighbor()));
 
-		ImageWidget *oiw = new ImageWidget(
-				*(p.process(traced, 900, 600).release()));
+    ImageWidget *oiw = new ImageWidget(
+        *(p.process(traced, 1200, 800).release()));
 
     QHBoxLayout *imgs = new QHBoxLayout();
-		imgs->addWidget(oiw);
+        imgs->addWidget(oiw);
 
     QWidget *topWidget = new QWidget();
     topWidget->setLayout(imgs);
