@@ -22,24 +22,22 @@
 
 #include "ray.h"
 
+using namespace std::tr1;
+
 Ray::~Ray()
 {
-    for(unsigned i=0; i<m_children.size(); ++i) 
-        delete m_children[i];
 }
 
 //! Allocate a new Ray, if we haven't reached limit of the hierarchy
-Ray* Ray::createParent()
+shared_ptr<Ray> Ray::createChild()
 {
-    if( m_depth >= m_depthLimit ) return 0;
+    if( m_depth >= m_depthLimit ) return shared_ptr<Ray> ();
 
-    Ray * newParent = new Ray(m_depthLimit);
-    if( !newParent ) return 0;
+    shared_ptr<Ray> newChild (new Ray(m_depthLimit));
+    newChild->m_depth = m_depth + 1;
+    m_children.push_back(newChild);
 
-    newParent->m_depth = m_depth + 1;
-
-    m_children.push_back(newParent);
-    return newParent;
+    return newChild;
 }
 
 //! Moves the origin of the ray a little bit.

@@ -25,34 +25,35 @@
 #define world_h_
 
 #include <vector>
+#include <memory>
 #include "image/colour.h"
 
 class LightSource;
 class Ray;
 class RayObject;
-class VisibleObject;
 
 /** A simple list of objects which may appear in a raytraced image.
  *  ( Could just use a std::vector right now, but I plan to add 
  *    extra features to speed up searches, so it's its own class */
 class World {
 private:
-    std::vector<VisibleObject*> m_visibles;
-    std::vector<LightSource*>   m_lights;
+    std::vector<RayObject*> m_objects;
     
 public:
+    ~World();
+
     //! Colour returned when a ray trace fails
-    RayColour                m_defaultColour;
+    RayColour m_defaultColour;
     /** Diffuse light experienced by all objects.  This is also the background
      *  colour that is set to any non-intersecting rays */
-    RayColour                m_globalDiffuse;
+    RayColour m_globalDiffuse;
   
     /** Trace a ray.
      *  @param ray  The ray to trace.
      *              The final colour of the ray will be stored in ray->m_colour
      *  @return true if the trace succeeds
      *          false if the trace fails, (e.g. too many reflections) */
-    bool trace(Ray *ray);
+    bool trace(Ray &ray);
 
     /** Determine which object a ray first intersects, but do not colour
      *  or continue tracing 
@@ -60,16 +61,15 @@ public:
      *             Intersect distance will be set if an intersect is found.
      *  @return    The first object intersecting the ray. 
      *             null if no objects intersect. */
-    VisibleObject * intersect(Ray *ray);
+    RayObject* intersect(Ray &ray);
  
-    /** Add an object to the world. 
-     *  @return true if successful, false if not */
-    bool addObject(RayObject *obj);
+    /** Add an object to the world. */
+    void addObject(std::auto_ptr<RayObject> &obj)
+        { m_objects.push_back(obj.release()); }
 
-    /* Access lights.
-     * TODO: factor external uses into World */
-    const std::vector<LightSource*>& lights() const 
-        {return m_lights;}
+    /* Access objects.  (For lighting) */
+    const std::vector<RayObject*>& objects() const 
+        {return m_objects;}
 };
 
 #endif //world_h_

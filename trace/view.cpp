@@ -82,7 +82,7 @@ void ParallelView::render(RayImage* image, World *world, int depth)
             TRACE(TRC_INFO,"Pixel endpoint: %s\n",
                   rImage.at(i,j).m_endpoint.snprint(trcbuf,36));
 
-            world->trace(&rImage.at(i,j));
+            world->trace(rImage.at(i,j));
 
             TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
                   i,j,rImage.at(i,j).m_colour.snprint(trcbuf,32));

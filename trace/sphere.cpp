@@ -21,15 +21,20 @@
  *****************************************************************************/
 
 #include <cmath>
+#include <tr1/memory>
 #include <gtest/gtest.h>
+#include <iostream>
 
 #include "sphere.h"
 
 #include "util/trace.h"
-#include "lighting.h"
-#include "object.h"
-#include "ray.h"
-#include "world.h"
+#include "trace/lighting.h"
+#include "trace/object.h"
+#include "trace/ray.h"
+#include "trace/world.h"
+
+using namespace std;
+using namespace std::tr1;
 
 static trc_ctl_t sphereTrc = {
     TRC_DFL_LVL,
@@ -40,20 +45,20 @@ static trc_ctl_t sphereTrc = {
     trc_printf(&sphereTrc,(level),1,args)
 
 //! Checks if a ray intersects this object.  
-double BaseSphere::intersectDist(Ray *inbound)
+double BaseSphere::intersectDist(Ray &inbound)
 {
     /* Find the intersections between the inbound unit vector and
      * this sphere. You will need a whiteboard to verify.*/
 
     // Vector from ray endpoint to centre of sphere
-    RayVector toCent = m_origin - inbound->m_endpoint;
+    RayVector toCent = m_origin - inbound.m_endpoint;
 
     // Square of the distance from ray encpoint to centre of sphere
     double cSq = toCent.length();
     cSq = cSq * cSq;
 
     // Distance from ray endpoint to point nearest sphere centre
-    double D = inbound->m_dir.dot(toCent);
+    double D = inbound.m_dir.dot(toCent);
 
     // Discriminant of the intersection distance quadratic:
     double discr = (m_radius*m_radius) + (D*D) - cSq;
@@ -91,16 +96,19 @@ RayVector BaseSphere::normal(const Coord &point) {
 }
 
 //! Colour a ray
-bool Sphere::colour(Ray* inbound, World* world) {
+bool Sphere::colour(Ray &inbound, World &world) {
     // Diffuse light:
-    RayColour colour = m_diffusivity * world->m_globalDiffuse;
+    RayColour colour = m_diffusivity * world.m_globalDiffuse;
 
     /* Add contributions of all light sources */
-    RayVector intersect = inbound->m_endpoint + 
-        inbound->m_dir * inbound->m_intersectDist;;
+    RayVector intersect = inbound.m_endpoint + 
+        inbound.m_dir * inbound.m_intersectDist;;
     RayVector interNorm = -normal(intersect);
-    for(unsigned i=0; i<world->lights().size(); ++i) {
-        Lighting cur = world->lights().at(i)->lightingAt(&intersect, world);
+    for(unsigned i=0; i<world.objects().size(); ++i) {
+        Lighting cur = world.objects().at(i)->lightingAt(intersect, world);
+
+		// Short-circuit if the object produces no light.
+		if (cur.m_intensity.magnitude() == 0.0) continue;
 
         double scale = cur.m_dir.dot(interNorm);
         if(scale<0.0) scale = 0.0;
@@ -109,20 +117,20 @@ bool Sphere::colour(Ray* inbound, World* world) {
     }
 
     /* Attempt to trace a reflection */
-    Ray * reflect = inbound->createParent();
-    if(reflect && (m_reflectivity.magnitude() != 0) ) {
+    shared_ptr<Ray> reflect = inbound.createChild();
+    if ((reflect != 0) && (m_reflectivity.magnitude() != 0)) {
         reflect->m_endpoint = intersect;
-        RayVector incNormal (interNorm.dot(inbound->m_dir) * interNorm);
-        RayVector incTangent ( (inbound->m_dir) - incNormal );
+        RayVector incNormal (interNorm.dot(inbound.m_dir) * interNorm);
+        RayVector incTangent ( (inbound.m_dir) - incNormal );
         reflect->m_dir = incTangent - incNormal;
         reflect->nudge();
         
-        if(world->trace(reflect)) {
+        if(world.trace(*reflect)) {
             colour = colour + (m_reflectivity * reflect->m_colour);
         }
     }
 
-    inbound->m_colour = colour;
+    inbound.m_colour = colour;
     return true;
 }
 
@@ -137,35 +145,35 @@ TEST(SphereTest, SphereIntersection) {
     RayVector direct_dir (-1.0, 0.0, 0.0);
     r.m_endpoint = endpt;
     r.m_dir = direct_dir;
-    ASSERT_GE( s.intersectDist(&r), 0) << "Direct intersection check";
+    ASSERT_GE( s.intersectDist(r), 0) << "Direct intersection check";
     
     /* Test a non-centred intersection */
     RayVector indirect_dir (-2.0, 0.5, 0.0);
     indirect_dir.unitify();
     r.m_dir = indirect_dir;
-    ASSERT_GE( s.intersectDist(&r),  0) << "Indirect intersection check";
+    ASSERT_GE( s.intersectDist(r),  0) << "Indirect intersection check";
     
     /* Test an edge intersection */
     // Some geometry gives us this vector, which just touches the edge.
     RayVector edge_dir (-1.5, sqrt(3)/2.0, 0.0);
     edge_dir.unitify();
     r.m_dir = edge_dir;
-    ASSERT_GE( s.intersectDist(&r), 0) << "Edge intersection check";
+    ASSERT_GE( s.intersectDist(r), 0) << "Edge intersection check";
     
     /* Test the complete wrong direction */
     RayVector opposite_dir (1.0, 0.0, 0.0);
     r.m_dir = opposite_dir;
-    ASSERT_LT( s.intersectDist(&r), 0) << "Opposite direction miss check";
+    ASSERT_LT( s.intersectDist(r), 0) << "Opposite direction miss check";
     
     /* Normal to direction of sphere */
     RayVector normal_dir (0.0, 1.0, 0.0);
     r.m_dir = normal_dir;
-    ASSERT_LT( s.intersectDist(&r), 0) << "Normal miss check";
+    ASSERT_LT( s.intersectDist(r), 0) << "Normal miss check";
     
     /* Near miss */
     RayVector near_dir (-1.5, sqrt(3)/2.0+0.01, 0.0);
     near_dir.unitify();
     r.m_dir = near_dir;
-    ASSERT_LT( s.intersectDist(&r), 0) << "Near miss check";
+    ASSERT_LT( s.intersectDist(r), 0) << "Near miss check";
 }
 

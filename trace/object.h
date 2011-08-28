@@ -30,39 +30,52 @@
 #define ray_object_h_
 
 #include "image/colour.h"
-#include "file/deserializable.h"
-
-#include "geom.h"
+#include "trace/geom.h"
+#include "trace/lighting.h"
 
 class Ray;
 class World;
 
 /** Abstract base for any objects within the world which effect
- *  tracing */
-class RayObject: public Deserializable {
+ *  tracing.  Object encompass both visible, physical objects and
+ *  objects which affect lighting conditions. */
+class RayObject {
 public:
-    /* Deserialize an object from Json */
-    virtual bool deserialize(const Json::Value& obj);
+    /** Determine this object's contribution to lighting at a 
+     *  given point in the world.
+     *  @param  point The point where lighting should be evaluated 
+     *  @return The intensity of light at the point */
+    virtual Lighting lightingAt(Coord &point, World &world) = 0;
 
-};
-
-/** Abstract base for any objects which may be intersected by a ray. */
-class VisibleObject: public virtual RayObject {
-public:
     /** Determine the distance from the ray's origin to the
      *  (nearest) intersection of the ray with this object 
      *  @param inbound The ray whose interesect distance is reauired. 
      *  @return        The intersect distance, if the ray intersects.
      *                 -1.0 If the ray does not intersect. */
-    virtual double intersectDist(Ray *inbound) = 0;
+    virtual double intersectDist(Ray &inbound) = 0;
 
    
     /* Determine the colour of a given ray.
      * @param inbound The ray to colour.
      * @param world   The world in which this object exists.  
      * @return        true if inbound intersects and has been coloured.
-     *                false if inbound does not actually intersect */
-    virtual bool colour(Ray *inbound, World *world) = 0;
+     *                false if inbound does not actally intersect */
+    virtual bool colour(Ray &inbound, World &world) = 0;
+};
+
+/** Object which does not produce light. */
+class NonLightingObject: public RayObject {
+public:
+    virtual Lighting lightingAt(Coord &point, World &world) {
+        return Lighting();
+    }
+};
+
+/** Object which cannot intersect rays. */
+class InvisibleObject: public RayObject {
+public:
+    virtual double intersectDist(Ray &inbound) { return -1; }
+    virtual bool   colour(Ray &inbound, World &world) { return true; }
 };
 
 #endif // ray_object_h_

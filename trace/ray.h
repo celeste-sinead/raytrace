@@ -5,7 +5,7 @@
  * A Ray tracks a ray of light from some observation point back to its origin
  * in order to determine helpful things like color and intensity.  Once the
  * origin of a ray is found, it may be necessary to spawn one or several
- * parent rays to determine the traits of the child ray ( if this seems 
+ * child rays to determine the traits of the parent ray ( if this seems 
  * backwards, that's because it is.  The whole point of ray tracing is that
  * we're working backwards ) 
  *
@@ -39,6 +39,7 @@
 #define ray_h_
 
 #include <vector>
+#include <tr1/memory>
 #include "image/colour.h"
 #include "geom.h"
 
@@ -55,7 +56,7 @@ class Ray {
 private:
     // Current ray hierarchy depth.
     int m_depth;
-    std::vector<Ray*> m_children;
+    std::vector<std::tr1::shared_ptr<Ray> > m_children;
 
 private:
     // We would need to do a deep copy.  So, no copying!
@@ -84,11 +85,10 @@ public:
      *  @param distance  The distance to move the origin. */
     void nudge(double distance=1E-5);
 	
-    /** Create a parent for this Ray, if possible.  
-     *  @return The new parent.  0 if creation fails (ie. we've reached the
+    /** Create a child for this Ray, if possible.  
+     *  @return The new child.  0 if creation fails (ie. we've reached the
      *          limit of the Ray hierarchy) */
-    Ray * createParent();
-    
+    std::tr1::shared_ptr<Ray> createChild();
 };
 
 #endif // ray_h_

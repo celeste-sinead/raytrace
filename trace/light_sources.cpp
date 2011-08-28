@@ -1,8 +1,8 @@
 /******************************************************************************
- * lighting.cpp
+ * light_sources.cpp
  * Copyright 2011 Iain Peet
  *
- * Defines entities in the world which cast light on their surroundings
+ * Defines a few RayObjects which cast light on the scene.
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -22,21 +22,20 @@
 
 #include <cmath>
 
-#include "lighting.h"
-#include "ray.h"
-#include "world.h"
-#include "object.h"
+#include "trace/light_sources.h"
+#include "trace/ray.h"
+#include "trace/world.h"
 
-Lighting PointSource::lightingAt(Coord * point, World *world )
+Lighting PointSource::lightingAt(Coord &point, World &world )
 {
     Ray lightRay;
-    RayVector toHere = m_origin - *point;
-    lightRay.m_endpoint = *point;
+    RayVector toHere = m_origin - point;
+    lightRay.m_endpoint = point;
     lightRay.m_dir = toHere;
     lightRay.m_dir.unitify();
     lightRay.nudge();
 
-    RayObject * obj = world->intersect(&lightRay);
+    RayObject *obj = world.intersect(lightRay);
 
     Lighting result;
     result.m_dir.set(1,0,0); // want nonzero vector incase somebody tries to math it
@@ -63,11 +62,9 @@ Lighting PointSource::lightingAt(Coord * point, World *world )
     return result;
 }
 
-bool SphereSource::colour(Ray* inbound, World* world)
+bool SphereSource::colour(Ray &inbound, World &world)
 {
-    /* Calculate decrease in intensity due to distance, as above */
-    double dist = inbound->m_intersectDist;
-    inbound->m_colour = m_intensity;
+    inbound.m_colour = m_intensity;
     return true;
 }
 

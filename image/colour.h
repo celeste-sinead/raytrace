@@ -48,41 +48,6 @@ enum ColourIndices {
   RED, GREEN, BLUE
 };
 
-/* Converts the unbounded positive HDR colours used in tracing into the [0,1] 
- * range used for RGB display, with a simple linear scale */
-class LinearHDRToDisplay : public ImageTransform {
-private:
-  /* Range of intensities for linear range: */
-  double m_min;
-  double m_max;  
-
-public:
-  LinearHDRToDisplay(double min, double max) :
-    m_min(min), m_max(max)
-    { }
-
-  virtual Image& apply(Image &img);
-};
-
-/** Converts the unbounded positive HDR colours used in tracing into the [0,1] 
- *  range used for RGB display, with a logarithmic intensity scale */
-class LogHDRToDisplay : public ImageTransform {
-private:
-  double m_min; // this intensity will map to 0.  
-  double m_max; // this intensity will map to 1.0. 
-
-public:
-  LogHDRToDisplay(double min, double max) :
-    m_min(min), m_max(max)
-    { }
-
-  virtual Image& apply(Image &img);
-};
-
-/* Converts a colour represented by a double in the range [0,1]
- * into an int of the specified number of bits */
-unsigned long intColour(double value, unsigned bits);
-
 /** A colour, for use within graphics calculations.  Intensity is positive,
  *  without bound.  */
 class RayColour {
@@ -121,6 +86,41 @@ public:
   //! Print this colour to a string, with maximum length.  Return the string.
   char* snprint(char* buf, int maxLen) const;
 };
+
+/* Converts the unbounded positive HDR colours used in tracing into the [0,1] 
+ * range used for RGB display, with a simple linear scale */
+class LinearHDRToDisplay : public ImageTransform {
+private:
+  /* Range of intensities for linear range: */
+  double m_min;
+  double m_max;  
+
+public:
+  LinearHDRToDisplay(double min, double max) :
+    m_min(min), m_max(max)
+    { }
+
+  virtual Image& apply(Image &img);
+};
+
+/** Converts the unbounded positive HDR colours used in tracing into the [0,1] 
+ *  range used for RGB display, with a logarithmic intensity scale */
+class LogHDRToDisplay : public ImageTransform {
+private:
+  double m_min; // this intensity will map to 0.  
+  double m_max; // this intensity will map to 1.0. 
+
+public:
+  LogHDRToDisplay(double min, double max) :
+    m_min(min), m_max(max)
+    { }
+
+  virtual Image& apply(Image &img);
+};
+
+/* Converts a colour represented by a double in the range [0,1]
+ * into an int of the specified number of bits */
+unsigned long intColour(double value, unsigned bits);
 
 #endif
 

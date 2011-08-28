@@ -33,7 +33,7 @@ class Ray;
  *  In addition to being useful for spherical objects, these methods
  *  are useful for coarse intersection checks for more complex
  *  objects which can be circumscribed by a sphere */
-class BaseSphere : public VisibleObject {
+class BaseSphere : public NonLightingObject {
 protected:
     //! Origin of this object. Center of a circumscribing sphere. 
     Coord     m_origin;
@@ -53,7 +53,7 @@ public:
     void setOrigin(const Coord& newOrig) { m_origin = newOrig; }
     void setRadius(double newRad) { m_radius = newRad; }
 
-    virtual double intersectDist(Ray* inbound);
+    virtual double intersectDist(Ray &inbound);
 };
 
 /** A solid sphere */
@@ -75,7 +75,7 @@ public:
         m_reflectivity(reflectivity)
         {}
 
-    virtual bool colour(Ray* inbound, World* world);
+    virtual bool colour(Ray &inbound, World &world);
 };
 
 #endif //SPHERE_H_

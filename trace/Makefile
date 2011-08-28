@@ -26,7 +26,7 @@ TRACE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 # Local source files that should be exported to build
 TRACE_CXX_SRCS:= \
                  geom.cpp \
-                 lighting.cpp \
+				 light_sources.cpp \
                  object.cpp \
                  ray.cpp \
                  render.cpp \

@@ -24,13 +24,11 @@
 #define LIGHTING_H_
 
 #include "image/colour.h"
-
 #include "trace/geom.h"
-#include "trace/object.h"
-#include "trace/sphere.h"
 
 class Ray;
 class World;
+
 
 /** Expresses a particular lighting condition.  Lighting
  *  has both intensity and direction */
@@ -47,42 +45,6 @@ public:
     Lighting(const Lighting &other) :
         m_dir(other.m_dir), m_intensity(other.m_intensity)
         {}
-};
-
-/** Abstract base for light sources. */
-class LightSource: public virtual RayObject {
-public:
-    /** Determine this light source's contribution to lighting at a 
-     *  given point in the world.
-     *  @param  point The point where lighting should be evaluated 
-     *  @return The intensity of light at the point */
-    virtual Lighting lightingAt(Coord* point, World* world) = 0;
-};
-
-/** A simple point source of light. */
-class PointSource : public LightSource {
-protected:
-    RayColour m_intensity;
-    RayVector m_origin;
-
-public:
-    PointSource(const RayVector &origin, const RayColour &intensity):
-        m_intensity(intensity), m_origin(origin)
-        {}
-
-    virtual Lighting lightingAt(Coord* point, World* world);
-};
-
-/** A visible, spherical light source.  Acts as a point source, but
- *  is also visible for direct ray intersection */
-class SphereSource : public PointSource, public BaseSphere {
-public:
-    SphereSource(const RayVector &origin, double radius, const RayColour &intensity):
-        PointSource(origin,intensity),
-        BaseSphere(origin,radius)
-        {}
-
-    virtual bool colour(Ray* inbound, World* world);
 };
 
 #endif // LIGHTING_H_

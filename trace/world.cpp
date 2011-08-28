@@ -42,37 +42,28 @@ static trc_ctl_t worldTrace = {
 #define TRACE(level, args...) \
    trc_printf(&worldTrace,level,1,args)
 
-//! Add an object
-bool World::addObject(RayObject *obj) {
-    VisibleObject *asVisible = dynamic_cast<VisibleObject*>(obj);
-    if (asVisible) {
-        m_visibles.push_back(asVisible);
-    }
-
-    LightSource *asLight = dynamic_cast<LightSource*>(obj);
-    if (asLight) {
-        m_lights.push_back(asLight);
-    }
-
-    return asVisible || asLight;
+World::~World() {
+	for (unsigned i=0; i < m_objects.size(); ++i) {
+		delete m_objects[i];
+	}
 }
 
 //! Trace a ray
-bool World::trace(Ray* ray)
+bool World::trace(Ray &ray)
 {
-    ray->m_colour = m_defaultColour;
-    VisibleObject * closest = 0;
+    ray.m_colour = m_defaultColour;
+    RayObject *closest = 0;
     double closestDist = 0.0;
    
     /* See if the ray hits any objects */
-    for(unsigned i=0; i < m_visibles.size(); ++i) {
-        double curDist = m_visibles.at(i)->intersectDist(ray);
+    for(unsigned i=0; i < m_objects.size(); ++i) {
+        double curDist = m_objects.at(i)->intersectDist(ray);
         TRACE(TRC_DTL, "Object %d distance: %f\n", i, curDist);
 
         if(curDist >= 0.0) { // Actually intersects
             if( (!closest) || (curDist < closestDist) ) {
                 // First intersection, or smallest intersection yet
-                closest = m_visibles.at(i);
+                closest = m_objects.at(i);
                 closestDist = curDist;
             }
         }
@@ -81,13 +72,13 @@ bool World::trace(Ray* ray)
     if( !closest ) {
         // Ray hits no objects, use background colour
         TRACE(TRC_INFO,"Ray hit no objects, given background colour.\n");
-        ray->m_colour = m_globalDiffuse;
-        ray->m_intersectDist = -1.0;
+        ray.m_colour = m_globalDiffuse;
+        ray.m_intersectDist = -1.0;
         return true;
     }
 
-    ray->m_intersectDist = closestDist;
-    if( closest->colour(ray, this) ) {
+    ray.m_intersectDist = closestDist;
+    if( closest->colour(ray, *this) ) {
         // Found colour successfully
         TRACE(TRC_INFO,"Got ray colour from intersect object.\n");
         return true;
@@ -98,23 +89,23 @@ bool World::trace(Ray* ray)
 }
 
 //! Find the first object intersecting a ray
-VisibleObject * World::intersect(Ray * ray)
+RayObject* World::intersect(Ray &ray)
 {
-    VisibleObject * closest = 0;
+    RayObject *closest = 0;
     double closestDist = -1.0;
 
     /* Look for objects for intersections */
-    for(unsigned i=0; i < m_visibles.size(); ++i) {
-        double curDist = m_visibles.at(i)->intersectDist(ray);
+    for(unsigned i=0; i < m_objects.size(); ++i) {
+        double curDist = m_objects.at(i)->intersectDist(ray);
         if(curDist >= 0.0) {
             if( (!closest) || (curDist < closestDist) ) {
-                closest = m_visibles.at(i);
+                closest = m_objects.at(i);
                 closestDist = curDist;
             }
         }
     }
 
-    ray->m_intersectDist = closestDist;
+    ray.m_intersectDist = closestDist;
     return closest;
 }
 

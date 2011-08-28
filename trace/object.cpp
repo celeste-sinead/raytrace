@@ -39,7 +39,4 @@ static trc_ctl_t rayObjectTrc = {
 #define TRACE(level, args...) \
     trc_printf(&rayObjectTrc,(level),1,args)
 
-bool RayObject::deserialize(const Json::Value& obj) {
-
-}
 

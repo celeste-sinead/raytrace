@@ -31,7 +31,9 @@
 #include "image/rayImage.h"
 #include "image/resample.h"
 #include "trace/lighting.h"
+#include "trace/light_sources.h"
 #include "trace/object.h"
+#include "trace/sphere.h"
 #include "trace/view.h"
 #include "trace/world.h"
 #include "ui/imageWidget.h"
@@ -57,36 +59,43 @@ void qtTest(QApplication &app) {
     world.m_defaultColour.set(0,1.0,0);  
     world.m_globalDiffuse.set(0.05, 0.05, 0.15); 
     
-    Sphere sph ( Coord(0,0,0), 1.0, 
+    auto_ptr<RayObject> sph (
+			new Sphere( Coord(0,0,0), 1.0, 
                  RayColour(0.1, 0.25, 1.0),
-                 RayColour(0.1,0.25,1.0) );
-    world.addObject(&sph);
+                 RayColour(0.1,0.25,1.0)));
+    world.addObject(sph);
 
-    Sphere sph2 ( Coord(0.5,1.5,1.5), 1.5, 
+    auto_ptr<RayObject> sph2 ( 
+			new Sphere( Coord(0.5,1.5,1.5), 1.5, 
                   RayColour(1.0, 1.0, 0.1),
-                  RayColour(1.0, 1.0, 0.2) );
-    world.addObject(&sph2);
+                  RayColour(1.0, 1.0, 0.2)));
+    world.addObject(sph2);
 
-    Sphere sph3 ( Coord(0,-1.25, 0), 0.5, 
+    auto_ptr<RayObject> sph3 (
+			new Sphere(Coord(0,-1.25, 0), 0.5, 
                   RayColour(0.1, 1.0, 0.1), 
-                  RayColour(0.2, 1.0, 0.2) );
-    world.addObject(&sph3);
+                  RayColour(0.2, 1.0, 0.2)));
+    world.addObject(sph3);
 
-    Sphere sph4( Coord(1.2,0.3,0.1), 0.75, 
+    auto_ptr<RayObject> sph4 (
+			new Sphere( Coord(1.2,0.3,0.1), 0.75, 
                  RayColour(1.0, 0.1, 0.1), 
-                 RayColour(1.0, 0.2, 0.2) );
-    world.addObject(&sph4);
+                 RayColour(1.0, 0.2, 0.2)));
+    world.addObject(sph4);
 
-    Sphere sph5( Coord(-3.5,-2, 2), 3,
+    auto_ptr<RayObject> sph5 (
+			new Sphere( Coord(-3.5,-2, 2), 3,
                  RayColour(0, 0, 0.4),
-                 RayColour(1, 1, 1) );
-    world.addObject(&sph5);
+                 RayColour(1, 1, 1)));
+    world.addObject(sph5);
 
-    SphereSource light1 (RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0));
-    world.addObject(&light1);
+    auto_ptr<RayObject> light1 (
+		new SphereSource(RayVector(1.5,-2.5,1.5), 0.125, RayColour(90.0,90.0,90.0)));
+    world.addObject(light1);
 
-    SphereSource light2 (RayVector(5,-1,-1), 0.125, RayColour(100,100,100));
-    world.addObject(&light2);
+    auto_ptr<RayObject> light2 (
+		new SphereSource(RayVector(5,-1,-1), 0.125, RayColour(100,100,100)));
+    world.addObject(light2);
     
     ParallelView view;
     view.m_origin = Coord(2.0,-2,2);
