@@ -102,13 +102,13 @@ void qtTest(QApplication &app) {
     view.m_xVec = RayVector(0,4.5,0);
     view.m_yVec = RayVector(0,0,-3);
     
-    RayImage traced (90, 60);
+    RayImage traced (300, 200);
 
     view.render(&traced, &world, 20);
 
     ImagePipeline p;
-    p.push(auto_ptr<ImageTransform>(new LogHDRToDisplay(0.0, 0.2)));
-    p.setResampler(auto_ptr<Resampler>(new NearestNeighbor()));
+    p.push(auto_ptr<ImageTransform>(new LogHDRToDisplay(0.0, 0.5)));
+    p.setResampler(auto_ptr<Resampler>(new BilinearInterpolator()));
 
     ImageWidget *oiw = new ImageWidget(
         *(p.process(traced, 1200, 800).release()));

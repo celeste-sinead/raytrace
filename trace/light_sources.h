@@ -42,27 +42,19 @@ public:
 
 /** A visible, spherical light source.  Acts as a point source, but
  *  is also visible for direct ray intersection */
-class SphereSource: public RayObject {
-private:
-    /* We have these as members rather than superclasses in order to avoid
-     * an ugly inheritance diamond. */
-    PointSource m_light;
-    Sphere      m_sphere;
-    RayColour   m_intensity;
-
+class SphereSource: public BaseSphere, public PointSource {
 public:
     SphereSource(const RayVector &origin, double radius, const RayColour &intensity):
-        m_light(origin, intensity),
-        m_sphere(origin, radius),
-        m_intensity(intensity)
+        BaseSphere(origin, radius),
+        PointSource(origin, intensity)
         {}
 
     virtual bool colour(Ray &inbound, World &world);
 
     virtual double intersectDist(Ray &inbound)
-        { return m_sphere.intersectDist(inbound); }
+        { return BaseSphere::intersectDist(inbound); }
     virtual Lighting lightingAt(Coord &point, World &world)
-        { return m_light.lightingAt(point, world); }
+        { return PointSource::lightingAt(point, world); }
 
 };
 

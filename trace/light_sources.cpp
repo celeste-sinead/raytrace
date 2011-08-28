@@ -45,7 +45,7 @@ Lighting PointSource::lightingAt(Coord &point, World &world )
     result.m_intensity.set(0,0,0);
 
     // If an intersection was found and is closer than this light...
-    if( (obj != this) && (lightRay.m_intersectDist < toHere.length() ) ) {
+    if( obj && (lightRay.m_intersectDist < toHere.length() ) ) {
         if( dynamic_cast<RayObject*>(this) != obj ) {
             /* Some entities will be both lights and objects, and will want to 
              * inherit this functionality.  This check is in place to make sure

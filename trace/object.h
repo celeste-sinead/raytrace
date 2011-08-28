@@ -64,7 +64,7 @@ public:
 };
 
 /** Object which does not produce light. */
-class NonLightingObject: public RayObject {
+class NonLightingObject: public virtual RayObject {
 public:
     virtual Lighting lightingAt(Coord &point, World &world) {
         return Lighting();
@@ -72,7 +72,7 @@ public:
 };
 
 /** Object which cannot intersect rays. */
-class InvisibleObject: public RayObject {
+class InvisibleObject: public virtual RayObject {
 public:
     virtual double intersectDist(Ray &inbound) { return -1; }
     virtual bool   colour(Ray &inbound, World &world) { return true; }
