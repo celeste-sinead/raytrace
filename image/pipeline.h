@@ -29,6 +29,7 @@
 #include <memory>
 
 class Image;
+class ImageSize;
 class ImageTransform;
 class RayImage;
 class Resampler;
@@ -63,7 +64,7 @@ public:
    * and height, the resampler set with setResampler will be used
    * to resample to the desired resolution. */
   std::auto_ptr<Image> process
-      (const RayImage& img, unsigned width, unsigned height);
+      (const RayImage& img, const ImageSize &size);
 };
 
 #endif //IMAGE_PIPELINE_H_

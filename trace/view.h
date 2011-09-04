@@ -38,7 +38,7 @@ class World;
 /** The RayView class interface. */
 class RayView {
 public:
-    virtual void render(RayImage *image, World *world, int depth=0) = 0;
+    virtual void render(RayImage &image, World &world, int depth=0) = 0;
 };
 
 /** A simple RayView implementation, which traces a number of parallel rays
@@ -54,7 +54,7 @@ public:
     RayVector   m_xVec;
     RayVector   m_yVec;
   
-    virtual void render(RayImage *image, World *world, int depth=0);
+    virtual void render(RayImage &image, World &world, int depth=0);
 };
 
 /** A view projected from a single point, with rays diverging over a given
@@ -67,7 +67,7 @@ public:
     RayVector m_yvec;
     double    m_yFov;
 
-    virtual void render(RayImage *image, World *world, int depth=0);
+    virtual void render(RayImage &image, World &world, int depth=0);
 };
 
 #endif //view_h_

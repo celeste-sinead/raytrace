@@ -23,10 +23,12 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPoint>
+#include <memory>
 
 #include "imageWidget.h"
 
 #include "image/image.h"
+#include "trace/render.h"
 #include "util/trace.h"
 
 static trc_ctl_t imgWidgetTrace = {
@@ -48,6 +50,25 @@ ImageWidget::ImageWidget(Image &img, QWidget * parent) :
     for(unsigned i=0; i<img.height(); ++i) {
         for(unsigned j=0; j<img.width(); ++j) {
             m_image.setPixel(j, i, toQColor(img, i, j).rgb());
+        }
+    }
+}
+
+ImageWidget::ImageWidget(Render &render, QWidget *parent) :
+    QWidget(parent),
+    m_image(render.m_processedSize.m_width, 
+        render.m_processedSize.m_height, 
+        QImage::Format_ARGB32)
+{
+    TRACE(TRC_INFO, "Created new ImageWidget, %dx%d\n", 
+        m_image.width(), m_image.height());
+
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    std::auto_ptr<Image> img = render.execute();
+    for(unsigned i=0; i<img->height(); ++i) {
+        for(unsigned j=0; j<img->width(); ++j) {
+            m_image.setPixel(j, i, toQColor(*img, i, j).rgb());
         }
     }
 }

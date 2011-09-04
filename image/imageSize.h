@@ -1,8 +1,8 @@
 /******************************************************************************
- * imageWidget.h
+ * imageSize.h
  * Copyright 2011 Iain Peet
  *
- * A Qt widget which draws a ray image.
+ * A simple class representing the size of an image (with + height)
  ******************************************************************************
  * This program is distributed under the of the GNU Lesser Public License. 
  *
@@ -20,33 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#ifndef IMAGE_WIDGET_H_
-#define IMAGE_WIDGET_H_
+#ifndef IMAGE_SIZE_H_
+#define IMAGE_SIZE_H_
 
-#include <QWidget>
-#include <QImage>
-#include <QColor>
-
-class Image;
-class Render;
-
-class ImageWidget : public QWidget { 
-Q_OBJECT
-private:
-    QImage m_image;
-
-    QColor toQColor(Image &img, unsigned i, unsigned j);
-
-protected:
-    void paintEvent(QPaintEvent *event);
-
+class ImageSize {
 public:
-    ImageWidget(Image &img, QWidget *parent = 0);
-    ImageWidget(Render &render, QWidget *parent = 0);
-
-    virtual QSize sizeHint() const 
-        { return m_image.size(); }
+    unsigned m_width;
+    unsigned m_height;
+    ImageSize(): m_width(0), m_height(0) {};
+    ImageSize(unsigned width, unsigned height):
+        m_width(width), m_height(height)
+        {}
 };
 
-#endif //IMAGE_WIDGET_H_
-
+#endif //IMAGE_SIZE_H_

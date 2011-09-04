@@ -21,5 +21,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#include "render.h"
+#include "trace/render.h"
+
+#include "image/rayImage.h"
+#include "trace/view.h"
+
+using namespace std;
+
+// Traces and processes a scene
+auto_ptr<Image> Render::execute() {
+    RayImage ri (m_renderSize);
+    m_view->render(ri, *m_world, 20); 
+    return m_pipeline->process(ri, m_processedSize);
+}
 

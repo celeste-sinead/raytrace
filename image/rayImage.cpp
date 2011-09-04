@@ -20,12 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *****************************************************************************/
 
-#include "rayImage.h"
+#include "image/rayImage.h"
+
+#include "image/imageSize.h"
 
 RayImage::RayImage(unsigned width, unsigned height) :
     m_rays(0), m_width(0), m_height(0)
 {
     setSize(width, height);
+}
+
+RayImage::RayImage(const ImageSize &size) :
+    m_rays(0), m_width(0), m_height(0)
+{
+    setSize(size.m_width, size.m_height);
 }
 
 RayImage::~RayImage() {

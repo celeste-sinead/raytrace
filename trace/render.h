@@ -24,24 +24,41 @@
 #ifndef RENDER_H_
 #define RENDER_H_
 
+#include <memory>
 #include <tr1/memory>
 
-class World;
-class View;
-class ImagePipeline;
+#include "image/image.h"
+#include "image/imageSize.h"
+#include "image/pipeline.h"
+#include "trace/view.h"
+#include "trace/world.h"
 
-/* Encapsulates a raytrace render.  
- * Currently, this is just a container - meat comes later */
+/* Encapsulates a raytrace render. */
 class Render {
 public:
-  std::tr1::shared_ptr<World> m_world;
-  std::tr1::shared_ptr<View>  m_view;
-  std::tr1::shared_ptr<ImagePipeline> m_pipeline;
+    std::tr1::shared_ptr<World>         m_world;
+    std::tr1::shared_ptr<RayView>       m_view;
+    std::tr1::shared_ptr<ImagePipeline> m_pipeline;
+    // Max number of bounces for rendering
+    int m_maxDepth;
+    // Size of the image to actually trace
+    ImageSize m_renderSize;
+    // Size to interpolate to in postprocessing
+    ImageSize m_processedSize;
 
 public:
-  Render() : m_world(), m_view(), m_pipeline()
-    { /* n/a */ }
+    Render() : 
+        m_world(), 
+        m_view(), 
+        m_pipeline(), 
+        m_maxDepth(0),
+        m_renderSize(), 
+        m_processedSize()
+        { /* n/a */ }
 
+    /* Execute the render.
+     * @return the rendered image */
+    std::auto_ptr<Image> execute();
 };
 
 #endif //RENDER_H_

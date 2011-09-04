@@ -24,10 +24,11 @@
 
 #include "pipeline.h"
 
-#include "image.h"
-#include "transform.h"
-#include "rayImage.h"
-#include "resample.h"
+#include "image/image.h"
+#include "image/imageSize.h"
+#include "image/transform.h"
+#include "image/rayImage.h"
+#include "image/resample.h"
 #include "util/trace.h"
 
 using namespace std;
@@ -69,8 +70,7 @@ auto_ptr<Image> ImagePipeline::process(const RayImage &img) {
 	return ret;
 }
 
-auto_ptr<Image> ImagePipeline::process
-		(const RayImage& img, unsigned width, unsigned height) 
+auto_ptr<Image> ImagePipeline::process(const RayImage& img, const ImageSize &size) 
 {
 	auto_ptr<Image> ret = process(img);
 
@@ -79,9 +79,9 @@ auto_ptr<Image> ImagePipeline::process
 		return ret;
 	}
 
-	if ((width != ret->width()) || (height != ret->height())) {
+	if ((size.m_width != ret->width()) || (size.m_height != ret->height())) {
 		// Need to resample the output image
-		m_resampler->setResolution(width, height);
+		m_resampler->setResolution(size.m_width, size.m_height);
 		m_resampler->apply(*ret);
 	}
 

@@ -45,17 +45,14 @@ static trc_ctl_t viewTrace = {
     trc_printf(&viewTrace,level,1,args)
 
 //! Render the given image using the given object list
-void ParallelView::render(RayImage* image, World *world, int depth)
+void ParallelView::render(RayImage &image, World &world, int depth)
 {
     char trcbuf[36];  // for trace messages
-    
-    // Create reference to image, for convenience
-    RayImage & rImage = *image;
     
     RayVector viewDir = m_xVec.cross(m_yVec).unitify();
 
     TRACE(TRC_STAT,"Beginning ParallelView render.\n");
-    TRACE(TRC_STAT,"Image size: %d x %d\n",rImage.width(),rImage.height());
+    TRACE(TRC_STAT,"Image size: %d x %d\n",image.width(),image.height());
     TRACE(TRC_STAT,"Origin: %s\n",m_origin.snprint(trcbuf,36));
     TRACE(TRC_STAT,"xVec: %s\n",m_xVec.snprint(trcbuf,36));
     TRACE(TRC_STAT,"yVec: %s\n",m_yVec.snprint(trcbuf,36));
@@ -64,10 +61,10 @@ void ParallelView::render(RayImage* image, World *world, int depth)
     /* Render the image */
     // The proportion of the width vector that is the distance from one pixel 
     // to the next
-    double pixStepX = 1.0/rImage.width();
-    double pixStepY = 1.0/rImage.height();
-    for(unsigned i=0; i<rImage.height(); i+=1) {
-        for(unsigned j=0; j<rImage.width(); j+=1) {
+    double pixStepX = 1.0/image.width();
+    double pixStepY = 1.0/image.height();
+    for(unsigned i=0; i<image.height(); i+=1) {
+        for(unsigned j=0; j<image.width(); j+=1) {
             double xDist =
                 pixStepX/2.0 // middle of pixel
                 + pixStepX*j; // which pixel
@@ -75,22 +72,22 @@ void ParallelView::render(RayImage* image, World *world, int depth)
                 pixStepY/2.0 
                 + pixStepY*i;
             
-            rImage.at(i,j).m_dir = viewDir;
-            rImage.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
-            rImage.at(i,j).m_depthLimit = depth;
+            image.at(i,j).m_dir = viewDir;
+            image.at(i,j).m_endpoint = m_origin + xDist*m_xVec + yDist*m_yVec;
+            image.at(i,j).m_depthLimit = depth;
 
             TRACE(TRC_INFO,"Pixel endpoint: %s\n",
-                  rImage.at(i,j).m_endpoint.snprint(trcbuf,36));
+                  image.at(i,j).m_endpoint.snprint(trcbuf,36));
 
-            world->trace(rImage.at(i,j));
+            world.trace(image.at(i,j));
 
             TRACE(TRC_INFO,"Render [%d,%d]: %s\n",
-                  i,j,rImage.at(i,j).m_colour.snprint(trcbuf,32));
+                  i,j,image.at(i,j).m_colour.snprint(trcbuf,32));
         }
     }
 }
 
-void AngleView::render(RayImage *image, World *object, int depth)
+void AngleView::render(RayImage &image, World &object, int depth)
 {
     #warning todo: implement
 }

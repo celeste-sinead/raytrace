@@ -26,6 +26,8 @@
 
 #include "trace/ray.h"
 
+class ImageSize;
+
 class RayImage {
 private:
     // Rays.  All rows are concatenated into one array.
@@ -40,6 +42,7 @@ private:
 
 public:
     RayImage(unsigned width=0, unsigned height=0);
+    RayImage(const ImageSize &size);
     virtual ~RayImage();
 
     unsigned width() const {return m_width;}
