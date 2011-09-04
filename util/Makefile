@@ -25,7 +25,8 @@ UTIL_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Local source files that should be exported to build
 UTIL_CXX_SRCS:= \
-                 trace.cpp
+                 trace.cpp \
+				 logger.cpp
 
 # Prepend the directory name
 UTIL_CXX_SRCS:= $(patsubst %,$(UTIL_DIR)%,$(UTIL_CXX_SRCS))
